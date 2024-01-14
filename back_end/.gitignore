@@ -1,0 +1,21 @@
+*.log
+*.pot
+*.pyc
+local_settings.py
+docs/_build
+build/
+dist/
+/django-import-export/
+*.egg-info/
+.tox/
+.idea/
+venv/
+*.python-version
+.coverage
+*.sw[po]
+*.sqlite3
+
+# IDE support
+.vscode
+
+tests/database.db
