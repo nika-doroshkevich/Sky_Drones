@@ -16,8 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('sky-drones/', include('app_users.urls')),
+    path('sky-drones/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('sky-drones/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('sky-drones/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
 ]

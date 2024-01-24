@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model, authenticate
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 UserModel = get_user_model()
 
@@ -17,7 +18,9 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         return user_obj
 
 
-class UserLoginSerializer(serializers.Serializer):
+class UserLoginSerializer(TokenObtainPairSerializer):  # serializers.Serializer
+    # TokenObtainPairSerializer
+
     email = serializers.EmailField()
     password = serializers.CharField()
 
