@@ -1,6 +1,5 @@
-from django.contrib.auth import get_user_model, authenticate
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 UserModel = get_user_model()
@@ -18,17 +17,9 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         return user_obj
 
 
-class UserLoginSerializer(TokenObtainPairSerializer):  # serializers.Serializer
-    # TokenObtainPairSerializer
-
+class UserLoginSerializer(TokenObtainPairSerializer):
     email = serializers.EmailField()
     password = serializers.CharField()
-
-    def check_user(self, clean_data):
-        user = authenticate(username=clean_data['email'], password=clean_data['password'])
-        if not user:
-            raise ValidationError('Invalid username or password')
-        return user
 
 
 class UserSerializer(serializers.ModelSerializer):

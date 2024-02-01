@@ -72,9 +72,7 @@ export default class Login extends Component<Props, State> {
             },
             error => {
                 const resMessage =
-                    (error.response &&
-                        error.response.data &&
-                        error.response.data.message) ||
+                    (error.response.data.detail) ||
                     error.message ||
                     error.toString();
 

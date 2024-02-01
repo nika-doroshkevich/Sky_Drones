@@ -1,5 +1,5 @@
 import {Component} from "react";
-import {Formik, Field, Form, ErrorMessage} from "formik";
+import {ErrorMessage, Field, Form, Formik} from "formik";
 import * as Yup from "yup";
 
 import AuthService from "../services/auth.service";
@@ -46,10 +46,10 @@ export default class Register extends Component<Props, State> {
             password: Yup.string()
                 .test(
                     "len",
-                    "The password must be between 6 and 40 characters.",
+                    "The password must be between 8 and 40 characters.",
                     (val: any) =>
                         val &&
-                        val.toString().length >= 6 &&
+                        val.toString().length >= 8 &&
                         val.toString().length <= 40
                 )
                 .required("This field is required!"),
@@ -58,7 +58,6 @@ export default class Register extends Component<Props, State> {
 
     handleRegister(formValue: { email: string; username: string; password: string }) {
         const {email, username, password} = formValue;
-        console.log("email, username, password " + email + " " + username + " " + password);
         this.setState({
             message: "",
             successful: false
@@ -77,10 +76,7 @@ export default class Register extends Component<Props, State> {
                 });
             },
             error => {
-                const resMessage =
-                    (error.response &&
-                        error.response.data &&
-                        error.response.data.message) ||
+                const resMessage = error.response.data.detail ||
                     error.message ||
                     error.toString();
                 console.log("resMessage " + resMessage);

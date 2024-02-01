@@ -1,40 +1,45 @@
-from django.contrib.auth import login, logout
+from django.contrib.auth import logout, get_user_model
 from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .serializers import UserRegisterSerializer, UserLoginSerializer, UserSerializer
-from .validations import custom_validation, validate_email, validate_password
+
+UserModel = get_user_model()
 
 
 class UserRegister(APIView):
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request):
-        clean_data = custom_validation(request.data)
-        serializer = UserRegisterSerializer(data=clean_data)
+
+        email = request.data['email'].strip()
+        username = request.data['username'].strip()
+        password = request.data['password'].strip()
+
+        if not email or UserModel.objects.filter(email=email).exists():
+            return Response({'detail': 'Please choose another email.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not password or len(password) < 8:
+            return Response({'detail': 'Please choose another password, min 8 characters.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        if not username:
+            return Response({'detail': 'Please choose another username.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = UserRegisterSerializer(data=request.data)
+
         if serializer.is_valid(raise_exception=True):
-            user = serializer.create(clean_data)
+            user = serializer.create(request.data)
             if user:
                 return Response(status=status.HTTP_201_CREATED)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response({'detail': 'Failed to create user.'}, status=status.HTTP_400_BAD_REQUEST)
 
-
-# class UserLogin(APIView):
-#     permission_classes = (permissions.AllowAny,)
 
 class UserLogin(TokenObtainPairView):
     serializer_class = UserLoginSerializer
-    # def post(self, request):
-    #     data = request.data
-    #     assert validate_email(data)
-    #     assert validate_password(data)
-    #     serializer = UserLoginSerializer(data=data)
-    #     if serializer.is_valid(raise_exception=True):
-    #         user = serializer.check_user(data)
-    #         login(request, user)
-    #         return Response(serializer.data, status=status.HTTP_200_OK)
+    permission_classes = (permissions.AllowAny,)
 
 
 class UserLogout(APIView):
