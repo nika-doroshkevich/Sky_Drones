@@ -36,11 +36,11 @@ export default class Register extends Component<Props, State> {
             username: Yup.string()
                 .test(
                     "len",
-                    "The username must be between 3 and 20 characters.",
+                    "The username must be between 3 and 30 characters.",
                     (val: any) =>
                         val &&
                         val.toString().length >= 3 &&
-                        val.toString().length <= 20
+                        val.toString().length <= 30
                 )
                 .required("This field is required!"),
             password: Yup.string()
