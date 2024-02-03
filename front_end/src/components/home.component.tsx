@@ -1,6 +1,6 @@
 import {Component} from "react";
 
-import UserService from "../services/user.service";
+import MainService from "../services/main.service";
 
 type Props = {};
 
@@ -18,7 +18,7 @@ export default class Home extends Component<Props, State> {
     }
 
     componentDidMount() {
-        UserService.getPublicContent().then(
+        MainService.getPublicContent().then(
             response => {
                 this.setState({
                     //content: response.data

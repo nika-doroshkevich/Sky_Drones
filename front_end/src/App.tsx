@@ -3,13 +3,13 @@ import {Link, Route, Routes} from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 
-import AuthService from "./services/auth.service";
+import AuthService from "./services/login-register/auth.service";
 import IUser from './types/user.type';
 
-import Login from "./components/login.component";
-import Register from "./components/register.component";
+import Login from "./components/login-register/login.component";
+import Register from "./components/login-register/register.component";
 import Home from "./components/home.component";
-import Profile from "./components/profile.component";
+import Profile from "./components/user/profile.component";
 import BoardUser from "./components/board-user.component";
 import BoardModerator from "./components/board-moderator.component";
 import BoardAdmin from "./components/board-admin.component";

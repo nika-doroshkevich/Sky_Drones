@@ -1,9 +1,9 @@
 import axios from 'axios';
-import authHeader from './auth-header';
+import authHeader from './login-register/auth-header';
 
 const API_URL = 'http://127.0.0.1:8000/sky-drones/';
 
-class UserService {
+class MainService {
     getPublicContent() {
         return axios.get(API_URL + 'all');
     }
@@ -21,4 +21,4 @@ class UserService {
     }
 }
 
-export default new UserService();
+export default new MainService();

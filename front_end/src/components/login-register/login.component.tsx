@@ -1,9 +1,10 @@
 import {Component} from "react";
 import {Navigate} from "react-router-dom";
-import {ErrorMessage, Field, Form, Formik} from "formik";
+import {Form, Formik} from "formik";
 import * as Yup from "yup";
 
-import AuthService from "../services/auth.service";
+import AuthService from "../../services/login-register/auth.service";
+import InputField from "../../common/InputField";
 
 type Props = {};
 
@@ -111,27 +112,11 @@ export default class Login extends Component<Props, State> {
                         onSubmit={this.handleLogin}
                     >
                         <Form>
-                            <div className="form-group">
-                                <label htmlFor="email">Email</label>
-                                <Field name="email" type="text" className="form-control"/>
-                                <ErrorMessage
-                                    name="email"
-                                    component="div"
-                                    className="alert alert-danger"
-                                />
-                            </div>
 
-                            <div className="form-group">
-                                <label htmlFor="password">Password</label>
-                                <Field name="password" type="password" className="form-control"/>
-                                <ErrorMessage
-                                    name="password"
-                                    component="div"
-                                    className="alert alert-danger"
-                                />
-                            </div>
+                            <InputField label="Email" name="email" type="text"/>
+                            <InputField label="Password" name="password" type="password"/>
 
-                            <div className="form-group">
+                            <div className="form-group text-center mt-3">
                                 <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
                                     {loading && (
                                         <span className="spinner-border spinner-border-sm"></span>

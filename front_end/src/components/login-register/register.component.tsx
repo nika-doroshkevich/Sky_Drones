@@ -1,8 +1,10 @@
 import {Component} from "react";
-import {ErrorMessage, Field, Form, Formik} from "formik";
+import {Form, Formik} from "formik";
 import * as Yup from "yup";
 
-import AuthService from "../services/auth.service";
+import AuthService from "../../services/login-register/auth.service";
+import InputField from "../../common/InputField";
+import SelectField from "../../common/SelectField";
 
 type Props = {};
 
@@ -10,6 +12,7 @@ type State = {
     email: string,
     username: string,
     password: string,
+    role: string,
     successful: boolean,
     message: string
 };
@@ -23,6 +26,7 @@ export default class Register extends Component<Props, State> {
             email: "",
             username: "",
             password: "",
+            role: "",
             successful: false,
             message: ""
         };
@@ -53,11 +57,13 @@ export default class Register extends Component<Props, State> {
                         val.toString().length <= 40
                 )
                 .required("This field is required!"),
+            role: Yup.string()
+                .required("This field is required!"),
         });
     }
 
-    handleRegister(formValue: { email: string; username: string; password: string }) {
-        const {email, username, password} = formValue;
+    handleRegister(formValue: { email: string; username: string; password: string; role: string }) {
+        const {email, username, password, role} = formValue;
         this.setState({
             message: "",
             successful: false
@@ -66,7 +72,8 @@ export default class Register extends Component<Props, State> {
         AuthService.register(
             email,
             username,
-            password
+            password,
+            role
         ).then(
             response => {
                 console.log("response " + JSON.stringify(response));
@@ -95,7 +102,15 @@ export default class Register extends Component<Props, State> {
             email: "",
             username: "",
             password: "",
+            role: "",
         };
+
+        const roleOptions = [
+            {value: "EMPLOYEE", label: "EMPLOYEE"},
+            {value: "CUSTOMER", label: "CUSTOMER"},
+            {value: "EMPLOYEE_OWNER", label: "EMPLOYEE_OWNER"},
+            {value: "CUSTOMER_OWNER", label: "CUSTOMER_OWNER"},
+        ];
 
         return (
             <div className="col-md-12">
@@ -114,41 +129,13 @@ export default class Register extends Component<Props, State> {
                         <Form>
                             {!successful && (
                                 <div>
-                                    <div className="form-group">
-                                        <label htmlFor="email"> Email </label>
-                                        <Field name="email" type="email" className="form-control"/>
-                                        <ErrorMessage
-                                            name="email"
-                                            component="div"
-                                            className="alert alert-danger"
-                                        />
-                                    </div>
 
-                                    <div className="form-group">
-                                        <label htmlFor="username"> Username </label>
-                                        <Field name="username" type="text" className="form-control"/>
-                                        <ErrorMessage
-                                            name="username"
-                                            component="div"
-                                            className="alert alert-danger"
-                                        />
-                                    </div>
+                                    <InputField label="Email" name="email" type="email"/>
+                                    <InputField label="Username" name="username" type="text"/>
+                                    <InputField label="Password" name="password" type="password"/>
+                                    <SelectField label="Role" name="role" options={roleOptions}/>
 
-                                    <div className="form-group">
-                                        <label htmlFor="password"> Password </label>
-                                        <Field
-                                            name="password"
-                                            type="password"
-                                            className="form-control"
-                                        />
-                                        <ErrorMessage
-                                            name="password"
-                                            component="div"
-                                            className="alert alert-danger"
-                                        />
-                                    </div>
-
-                                    <div className="form-group">
+                                    <div className="form-group text-center mt-3">
                                         <button type="submit" className="btn btn-primary btn-block">Sign Up</button>
                                     </div>
                                 </div>

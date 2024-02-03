@@ -1,5 +1,5 @@
 from django.contrib.auth import logout, get_user_model
-from rest_framework import permissions, status
+from rest_framework import permissions, status, generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -56,6 +56,12 @@ class UserView(APIView):
     def get(self, request):
         serializer = UserSerializer(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class UserAPIUpdate(generics.UpdateAPIView):
+    permission_classes = (permissions.IsAuthenticated,)
+    queryset = UserModel.objects.all()
+    serializer_class = UserSerializer
 
 
 class AllView(APIView):
