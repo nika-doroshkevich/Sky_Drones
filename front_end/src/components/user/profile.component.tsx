@@ -176,7 +176,7 @@ export default class Profile extends Component<Props, State> {
         const titleOptions = [
             {value: "Mr", label: "Mr"},
             {value: "Ms", label: "Ms"},
-            {value: "Other", label: "Other"},
+            {value: "Mx", label: "Mx"},
         ];
 
         return (

@@ -2,7 +2,9 @@ from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
 from django.db import models
 
-from .utils import UserStatuses, UserRoles
+from companies.models import Company
+from sky_drones.utils import Statuses
+from .utils import UserRoles
 
 
 class AppUserManager(BaseUserManager):
@@ -25,8 +27,9 @@ class AppUser(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=30)
     phone = models.CharField(max_length=40, null=True)
     job_title = models.CharField(max_length=50, null=True)
-    status = models.CharField(max_length=10, choices=UserStatuses.choices(), default=UserStatuses.ACTIVE.value)
+    status = models.CharField(max_length=10, choices=Statuses.choices(), default=Statuses.ACTIVE.value)
     role = models.CharField(max_length=20, choices=UserRoles.choices(), null=True)
+    company = models.ForeignKey(Company, on_delete=models.PROTECT, null=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']

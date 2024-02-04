@@ -26,7 +26,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-ORS_ALLOWED_ORIGINS = [
+CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:3000'
 ]
 
@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'app_users.apps.AppUsersConfig',
+    'companies.apps.CompaniesConfig',
     'corsheaders',
 ]
 
