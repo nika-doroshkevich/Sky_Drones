@@ -19,14 +19,14 @@ class UserRegister(APIView):
         password = request.data['password'].strip()
 
         if not email or UserModel.objects.filter(email=email).exists():
-            return Response({'detail': 'Please choose another email.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": "Please choose another email."}, status=status.HTTP_400_BAD_REQUEST)
 
         if not password or len(password) < 8:
-            return Response({'detail': 'Please choose another password, min 8 characters.'},
+            return Response({"detail": "Please choose another password, min 8 characters."},
                             status=status.HTTP_400_BAD_REQUEST)
 
         if not username:
-            return Response({'detail': 'Please choose another username.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": "Please choose another username."}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = UserRegisterSerializer(data=request.data)
 
@@ -34,7 +34,7 @@ class UserRegister(APIView):
             user = serializer.create(request.data)
             if user:
                 return Response(status=status.HTTP_201_CREATED)
-        return Response({'detail': 'Failed to create user.'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"detail": "Failed to create user."}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserLogin(TokenObtainPairView):

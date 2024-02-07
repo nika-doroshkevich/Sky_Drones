@@ -1,4 +1,5 @@
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate
+from django.utils import timezone
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
@@ -21,6 +22,23 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 class UserLoginSerializer(TokenObtainPairSerializer):
     email = serializers.EmailField()
     password = serializers.CharField()
+
+    def validate(self, attrs):
+        email = attrs.get('email')
+        password = attrs.get('password')
+
+        user = authenticate(email=email, password=password)
+
+        if user is None:
+            raise serializers.ValidationError({"detail": "Invalid credentials"})
+
+        if user.status != 'ACTIVE':
+            raise serializers.ValidationError({"detail": "The account is inactive. Contact an admin"})
+        else:
+            user.last_login = timezone.now()
+            user.save()
+
+        return super().validate(attrs)
 
 
 class UserSerializer(serializers.ModelSerializer):
