@@ -9,7 +9,7 @@ type State = {
     content: string;
 }
 
-export default class BoardAdmin extends Component<Props, State> {
+export default class BoardModerator extends Component<Props, State> {
     constructor(props: Props) {
         super(props);
 
@@ -46,7 +46,8 @@ export default class BoardAdmin extends Component<Props, State> {
         return (
             <div className="container">
                 <header className="jumbotron">
-                    <h3>{this.state.content}</h3>
+                    {/*<h3>{this.state.content}</h3>*/}
+                    <h3>Hello Mod</h3>
                 </header>
             </div>
         );

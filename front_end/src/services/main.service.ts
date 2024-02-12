@@ -13,11 +13,11 @@ class MainService {
     }
 
     async getModeratorBoard() {
-        return axios.get(API_URL + 'mod', await authHeader());
+        return axios.get(API_URL + 'users', await authHeader());
     }
 
-    async getAdminBoard() {
-        return axios.get(API_URL + 'admin', await authHeader());
+    async getOwnerBoard() {
+        return axios.get(API_URL + 'users', await authHeader());
     }
 }
 

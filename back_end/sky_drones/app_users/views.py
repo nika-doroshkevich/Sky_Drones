@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 
+from sky_drones.utils import RoleBasedPermission
 from .serializers import UserRegisterSerializer, UserLoginSerializer, UserSerializer
 
 UserModel = get_user_model()
@@ -56,6 +57,12 @@ class UserView(APIView):
     def get(self, request):
         serializer = UserSerializer(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class UserList(generics.ListAPIView):
+    permission_classes = (permissions.IsAuthenticated, RoleBasedPermission,)
+    queryset = UserModel.objects.all()
+    serializer_class = UserSerializer
 
 
 class UserAPIUpdate(generics.UpdateAPIView):

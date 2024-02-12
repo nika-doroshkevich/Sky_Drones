@@ -21,6 +21,7 @@ from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('sky-drones/', include('app_users.urls')),
+    path('sky-drones/', include('companies.urls')),
     path('sky-drones/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('sky-drones/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
 ]

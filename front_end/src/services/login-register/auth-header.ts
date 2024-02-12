@@ -17,7 +17,13 @@ export default async function authHeader(): Promise<AxiosRequestConfig> {
             try {
                 const refreshResponse = await axios.post(API_URL + "token/refresh/", {refresh: user.refresh});
 
-                const newToken = {access: refreshResponse.data.access, refresh: user.refresh};
+                const newToken = {
+                    access: refreshResponse.data.access,
+                    refresh: user.refresh,
+                    role: user.role,
+                    email: user.email,
+                    id: user.id
+                };
                 localStorage.setItem("user", JSON.stringify(newToken));
 
                 return {headers: {Authorization: 'Bearer ' + refreshResponse.data.access}};

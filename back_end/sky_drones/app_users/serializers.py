@@ -38,7 +38,11 @@ class UserLoginSerializer(TokenObtainPairSerializer):
             user.last_login = timezone.now()
             user.save()
 
-        return super().validate(attrs)
+        token = super().validate(attrs)
+        token['role'] = user.role
+        token['email'] = email
+        token['id'] = user.id
+        return token
 
 
 class UserSerializer(serializers.ModelSerializer):

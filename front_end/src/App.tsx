@@ -12,7 +12,8 @@ import Home from "./components/home.component";
 import Profile from "./components/user/profile.component";
 import BoardUser from "./components/board-user.component";
 import BoardModerator from "./components/board-moderator.component";
-import BoardAdmin from "./components/board-admin.component";
+import BoardOwner from "./components/board-owner.component";
+import Company from "./components/company.component";
 
 import EventBus from "./common/EventBus";
 
@@ -20,7 +21,7 @@ type Props = {};
 
 type State = {
     showModeratorBoard: boolean,
-    showAdminBoard: boolean,
+    showOwnerBoard: boolean,
     currentUser: IUser | undefined
 }
 
@@ -31,7 +32,7 @@ class App extends Component<Props, State> {
 
         this.state = {
             showModeratorBoard: false,
-            showAdminBoard: false,
+            showOwnerBoard: false,
             currentUser: undefined,
         };
     }
@@ -39,11 +40,12 @@ class App extends Component<Props, State> {
     componentDidMount() {
         const user = AuthService.getCurrentUser();
 
+        console.log("user" + JSON.stringify(user));
+
         if (user) {
             this.setState({
                 currentUser: user,
-                // showModeratorBoard: user.roles.includes("ROLE_MODERATOR"),
-                // showAdminBoard: user.roles.includes("ROLE_ADMIN"),
+                showOwnerBoard: user.role === "EMPLOYEE_OWNER" || user.role === "CUSTOMER_OWNER",
             });
         }
 
@@ -58,13 +60,13 @@ class App extends Component<Props, State> {
         AuthService.logout();
         this.setState({
             showModeratorBoard: false,
-            showAdminBoard: false,
+            showOwnerBoard: false,
             currentUser: undefined,
         });
     }
 
     render() {
-        const {currentUser, showModeratorBoard, showAdminBoard} = this.state;
+        const {currentUser, showModeratorBoard, showOwnerBoard} = this.state;
 
         return (
             <div>
@@ -87,10 +89,18 @@ class App extends Component<Props, State> {
                             </li>
                         )}
 
-                        {showAdminBoard && (
+                        {showOwnerBoard && (
                             <li className="nav-item">
-                                <Link to={"/admin"} className="nav-link">
-                                    Admin Board
+                                <Link to={"/users"} className="nav-link">
+                                    Owner Board
+                                </Link>
+                            </li>
+                        )}
+
+                        {showOwnerBoard && (
+                            <li className="nav-item">
+                                <Link to={"/company"} className="nav-link">
+                                    Company
                                 </Link>
                             </li>
                         )}
@@ -142,8 +152,9 @@ class App extends Component<Props, State> {
                         <Route path="/register" element={<Register/>}/>
                         <Route path="/profile" element={<Profile/>}/>
                         <Route path="/user" element={<BoardUser/>}/>
-                        <Route path="/mod" element={<BoardModerator/>}/>
-                        <Route path="/admin" element={<BoardAdmin/>}/>
+                        <Route path="/user" element={<BoardModerator/>}/>
+                        <Route path="/users" element={<BoardOwner/>}/>
+                        <Route path="/company" element={<Company/>}/>
                     </Routes>
                 </div>
 
