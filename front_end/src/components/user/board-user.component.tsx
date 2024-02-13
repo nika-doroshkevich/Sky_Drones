@@ -1,7 +1,6 @@
 import {Component} from "react";
-
-import MainService from "../services/main.service";
-import EventBus from "../common/EventBus";
+import EventBus from "../../common/EventBus";
+import UserService from "../../services/user.service";
 
 type Props = {};
 
@@ -19,7 +18,7 @@ export default class BoardUser extends Component<Props, State> {
     }
 
     componentDidMount() {
-        MainService.getUserBoard().then(
+        UserService.getUserBoard().then(
             response => {
                 console.log("response " + response.status);
                 this.setState({

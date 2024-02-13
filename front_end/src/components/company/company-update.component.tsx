@@ -1,13 +1,12 @@
-import React, {Component} from "react";
+import {Component} from "react";
 import {Navigate} from "react-router-dom";
-import AuthService from "../services/login-register/auth.service";
-import IUser from "../types/user.type";
-import EventBus from "../common/EventBus";
-import {ErrorMessage, Field, Form, Formik} from "formik";
+import AuthService from "../../services/login-register/auth.service";
+import IUser from "../../types/user.type";
+import EventBus from "../../common/EventBus";
+import {Form, Formik} from "formik";
 import * as Yup from "yup";
-import InputField from "../common/InputField";
-import CompanyService from "../services/company.service";
-import ICompany from "../types/company.type";
+import InputField from "../../common/InputField";
+import CompanyService from "../../services/company.service";
 
 type Props = {};
 
@@ -19,16 +18,15 @@ type State = {
     message: string,
     successful: boolean,
 
-    inspectingCompanies: ICompany[],
-
     id: number,
     name: string,
     phone: string,
     website: string,
     companyType: string,
-    inspectingCompany: any
+    inspectingCompanyId: number,
+    inspectingCompanyName: string
 }
-export default class Company extends Component<Props, State> {
+export default class CompanyUpdate extends Component<Props, State> {
     constructor(props: Props) {
         super(props);
 
@@ -40,17 +38,16 @@ export default class Company extends Component<Props, State> {
             message: "",
             successful: false,
 
-            inspectingCompanies: [],
-
             id: 0,
             name: "",
             phone: "",
             website: "",
             companyType: "",
-            inspectingCompany: null
+            inspectingCompanyId: 0,
+            inspectingCompanyName: ""
         };
 
-        this.handleCreate = this.handleCreate.bind(this);
+        this.handleUpdate = this.handleUpdate.bind(this);
     }
 
     validationSchema() {
@@ -61,8 +58,6 @@ export default class Company extends Component<Props, State> {
                 .required("This field is required!"),
             website: Yup.string()
                 .required("This field is required!"),
-            companyType: Yup.string()
-                .required("This field is required!"),
         });
     }
 
@@ -72,11 +67,15 @@ export default class Company extends Component<Props, State> {
         if (!currentUser) this.setState({redirect: "/home"});
         this.setState({currentUser: currentUser, userReady: true})
 
-        CompanyService.getCompaniesByType('INSPECTING').then(
+        CompanyService.getCompanyByUser(currentUser.id).then(
             response => {
-                console.log("response " + response.status);
                 this.setState({
-                    inspectingCompanies: response.data
+                    id: response.data.id,
+                    name: response.data.name,
+                    phone: response.data.phone,
+                    website: response.data.website,
+                    companyType: response.data.company_type,
+                    inspectingCompanyId: response.data.inspecting_company
                 });
             },
             error => {
@@ -96,27 +95,56 @@ export default class Company extends Component<Props, State> {
         );
     }
 
-    handleCreate(formValue: {
+    componentDidUpdate(prevProps: Props, prevState: State) {
+        if (prevState.inspectingCompanyId !== this.state.inspectingCompanyId && this.state.inspectingCompanyId !== null) {
+            CompanyService.getCompany(this.state.inspectingCompanyId).then(
+                response => {
+                    this.setState({
+                        inspectingCompanyName: response.data.name || null
+                    });
+                },
+                error => {
+                    this.setState({
+                        message:
+                            (error.response &&
+                                error.response.data &&
+                                error.response.data.message) ||
+                            error.message ||
+                            error.toString()
+                    });
+
+                    if (error.response && error.response.status === 401) {
+                        EventBus.dispatch("logout");
+                    }
+                }
+            );
+        }
+    }
+
+    handleUpdate(formValue: {
+        id: number,
         name: string;
         phone: string;
         website: string;
         companyType: string;
-        inspectingCompany: any
+        inspectingCompanyId: number;
+
     }) {
-        const {name, phone, website, companyType, inspectingCompany} = formValue;
+        const {id, name, phone, website, companyType, inspectingCompanyId} = formValue;
         this.setState({
             message: "",
             successful: false
         });
 
-        CompanyService.create(
+        CompanyService.update(
+            id,
             name,
             phone,
             website,
             companyType,
-            inspectingCompany
+            inspectingCompanyId
         ).then(
-            response => {
+            () => {
                 this.setState({
                     message: "The data has been saved successfully!",
                     successful: true
@@ -143,12 +171,13 @@ export default class Company extends Component<Props, State> {
         const {loading, message, successful} = this.state;
 
         const initialValues = {
-            name: "",
-            phone: "",
-            website: "",
-            companyType: "",
-            inspectingCompanies: "",
-            inspectingCompany: ""
+            id: this.state.id,
+            name: this.state.name,
+            phone: this.state.phone,
+            website: this.state.website,
+            companyType: this.state.companyType || "",
+            inspectingCompanyId: this.state.inspectingCompanyId,
+            inspectingCompanyName: this.state.inspectingCompanyName || ""
         };
 
         return (
@@ -159,7 +188,7 @@ export default class Company extends Component<Props, State> {
                             <Formik
                                 initialValues={initialValues}
                                 validationSchema={this.validationSchema}
-                                onSubmit={this.handleCreate}
+                                onSubmit={this.handleUpdate}
                                 enableReinitialize
                             >
                                 <Form>
@@ -167,50 +196,16 @@ export default class Company extends Component<Props, State> {
                                     <InputField label="Name" name="name" type="text"/>
                                     <InputField label="Phone" name="phone" type="text"/>
                                     <InputField label="Website" name="website" type="text"/>
-
-                                    <div className="form-group">
-                                        <label htmlFor="companyType">Company type</label>
-                                        <Field
-                                            name="companyType"
-                                            as="select"
-                                            className="form-control"
-                                        >
-                                            <option value="" disabled>Select a company type</option>
-                                            <option value="INSPECTING">INSPECTING</option>
-                                            <option value="INSPECTED">INSPECTED</option>
-                                        </Field>
-                                        <ErrorMessage
-                                            name="companyType"
-                                            component="div"
-                                            className="alert alert-danger"
-                                        />
-                                    </div>
-
-                                    <div className="form-group">
-                                        <label htmlFor="inspectingCompany">Inspecting company</label>
-                                        <Field
-                                            name="inspectingCompany"
-                                            as="select"
-                                            className="form-control"
-                                        >
-                                            <option value="" disabled>Select an inspecting company</option>
-                                            {this.state.inspectingCompanies.map(company => (
-                                                <option key={company.id} value={company.id}>{company.name}</option>
-                                            ))}
-                                        </Field>
-                                        <ErrorMessage
-                                            name="inspectingCompany"
-                                            component="div"
-                                            className="alert alert-danger"
-                                        />
-                                    </div>
+                                    <InputField label="Company type" name="companyType" type="text" disabled/>
+                                    <InputField label="Inspecting company" name="inspectingCompanyName" type="text"
+                                                disabled/>
 
                                     <div className="form-group text-center mt-3">
                                         <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
                                             {loading && (
                                                 <span className="spinner-border spinner-border-sm"></span>
                                             )}
-                                            <span>Create</span>
+                                            <span>Update</span>
                                         </button>
                                     </div>
 

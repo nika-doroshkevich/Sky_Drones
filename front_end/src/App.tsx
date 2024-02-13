@@ -10,17 +10,16 @@ import Login from "./components/login-register/login.component";
 import Register from "./components/login-register/register.component";
 import Home from "./components/home.component";
 import Profile from "./components/user/profile.component";
-import BoardUser from "./components/board-user.component";
-import BoardModerator from "./components/board-moderator.component";
-import BoardOwner from "./components/board-owner.component";
-import Company from "./components/company.component";
+import BoardUser from "./components/user/board-user.component";
+import BoardOwner from "./components/user/board-owner.component";
+import Company from "./components/company/company.component";
 
 import EventBus from "./common/EventBus";
+import CompanyUpdate from "./components/company/company-update.component";
 
 type Props = {};
 
 type State = {
-    showModeratorBoard: boolean,
     showOwnerBoard: boolean,
     currentUser: IUser | undefined
 }
@@ -31,7 +30,6 @@ class App extends Component<Props, State> {
         this.logOut = this.logOut.bind(this);
 
         this.state = {
-            showModeratorBoard: false,
             showOwnerBoard: false,
             currentUser: undefined,
         };
@@ -59,14 +57,13 @@ class App extends Component<Props, State> {
     logOut() {
         AuthService.logout();
         this.setState({
-            showModeratorBoard: false,
             showOwnerBoard: false,
             currentUser: undefined,
         });
     }
 
     render() {
-        const {currentUser, showModeratorBoard, showOwnerBoard} = this.state;
+        const {currentUser, showOwnerBoard} = this.state;
 
         return (
             <div>
@@ -81,14 +78,6 @@ class App extends Component<Props, State> {
                             </Link>
                         </li>
 
-                        {showModeratorBoard && (
-                            <li className="nav-item">
-                                <Link to={"/mod"} className="nav-link">
-                                    Moderator Board
-                                </Link>
-                            </li>
-                        )}
-
                         {showOwnerBoard && (
                             <li className="nav-item">
                                 <Link to={"/users"} className="nav-link">
@@ -99,8 +88,16 @@ class App extends Component<Props, State> {
 
                         {showOwnerBoard && (
                             <li className="nav-item">
-                                <Link to={"/company"} className="nav-link">
-                                    Company
+                                <Link to={"/company-create"} className="nav-link">
+                                    New company
+                                </Link>
+                            </li>
+                        )}
+
+                        {showOwnerBoard && (
+                            <li className="nav-item">
+                                <Link to={"/company-update"} className="nav-link">
+                                    Update company
                                 </Link>
                             </li>
                         )}
@@ -152,9 +149,9 @@ class App extends Component<Props, State> {
                         <Route path="/register" element={<Register/>}/>
                         <Route path="/profile" element={<Profile/>}/>
                         <Route path="/user" element={<BoardUser/>}/>
-                        <Route path="/user" element={<BoardModerator/>}/>
                         <Route path="/users" element={<BoardOwner/>}/>
-                        <Route path="/company" element={<Company/>}/>
+                        <Route path="/company-create" element={<Company/>}/>
+                        <Route path="/company-update" element={<CompanyUpdate/>}/>
                     </Routes>
                 </div>
 

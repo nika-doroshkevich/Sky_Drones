@@ -1,8 +1,7 @@
 import {Component} from "react";
-
-import MainService from "../services/main.service";
-import EventBus from "../common/EventBus";
-import IUser from "../types/user.type";
+import EventBus from "../../common/EventBus";
+import IUser from "../../types/user.type";
+import UserService from "../../services/user.service";
 
 type Props = {};
 
@@ -22,7 +21,7 @@ export default class BoardOwner extends Component<Props, State> {
     }
 
     componentDidMount() {
-        MainService.getOwnerBoard().then(
+        UserService.getOwnerBoard().then(
             response => {
                 this.setState({
                     user: response.data

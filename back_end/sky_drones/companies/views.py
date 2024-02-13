@@ -1,8 +1,14 @@
-from rest_framework import generics, permissions
+from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
+from rest_framework import generics, permissions, status
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from sky_drones.utils import RoleBasedPermission
 from .models import Company
 from .serializers import CompanySerializer
+
+UserModel = get_user_model()
 
 
 class CompanyAPIListCreate(generics.ListCreateAPIView):
@@ -26,7 +32,18 @@ class CompanyAPIListCreate(generics.ListCreateAPIView):
         return context
 
 
-class CompanyAPIUpdate(generics.UpdateAPIView):
-    permission_classes = (permissions.IsAuthenticated,)
+class CompanyByUser(APIView):
+    permission_classes = (permissions.IsAuthenticated, RoleBasedPermission,)
+
+    def get(self, request, pk):
+        user = get_object_or_404(UserModel, pk=pk)
+        company_id = user.company_id
+        company = get_object_or_404(Company, pk=company_id)
+        serializer = CompanySerializer(company)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class CompanyAPIRetrieveUpdate(generics.RetrieveUpdateAPIView):
+    permission_classes = (permissions.IsAuthenticated, RoleBasedPermission,)
     queryset = Company.objects.all()
     serializer_class = CompanySerializer
