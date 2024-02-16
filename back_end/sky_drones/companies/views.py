@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from rest_framework import generics, permissions, status
+from rest_framework import generics, permissions, status, serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -11,8 +11,8 @@ from .serializers import CompanySerializer
 UserModel = get_user_model()
 
 
-class CompanyAPIListCreate(generics.ListCreateAPIView):
-    permission_classes = (permissions.IsAuthenticated, RoleBasedPermission,)
+class CompanyAPIList(generics.ListAPIView):
+    permission_classes = (permissions.IsAuthenticated,)
     queryset = Company.objects.all()
     serializer_class = CompanySerializer
 
@@ -24,7 +24,13 @@ class CompanyAPIListCreate(generics.ListCreateAPIView):
         elif company_type == 'INSPECTING':
             return Company.objects.filter(company_type='INSPECTING')
         else:
-            return Company.objects.none()
+            raise serializers.ValidationError({"detail": "No companies have been found"})
+
+
+class CompanyAPICreate(generics.CreateAPIView):
+    permission_classes = (permissions.IsAuthenticated, RoleBasedPermission,)
+    queryset = Company.objects.all()
+    serializer_class = CompanySerializer
 
     def get_serializer_context(self):
         context = super().get_serializer_context()

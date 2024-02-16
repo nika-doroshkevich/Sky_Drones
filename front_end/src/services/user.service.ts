@@ -15,6 +15,14 @@ class UserService {
         }, authConfig);
     }
 
+    async joinCompany(id: number, email: string, company: number) {
+        const authConfig = await authHeader();
+        return axios.put(API_URL + "user/" + id, {
+            email,
+            company
+        }, authConfig);
+    }
+
     getPublicContent() {
         return axios.get(API_URL + 'all');
     }

@@ -7,7 +7,7 @@ class CompanyService {
 
     async create(name: string, phone: string, website: string, company_type: string, inspecting_company: number) {
         const authConfig = await authHeader();
-        return axios.post(API_URL + "company", {
+        return axios.post(API_URL + "company-create", {
             name,
             phone,
             website,

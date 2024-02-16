@@ -70,6 +70,11 @@ class UserAPIUpdate(generics.UpdateAPIView):
     queryset = UserModel.objects.all()
     serializer_class = UserSerializer
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
+
 
 class AllView(APIView):
     def get(self, request):

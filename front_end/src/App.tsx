@@ -10,9 +10,9 @@ import Login from "./components/login-register/login.component";
 import Register from "./components/login-register/register.component";
 import Home from "./components/home.component";
 import Profile from "./components/user/profile.component";
-import BoardUser from "./components/user/board-user.component";
+import JoinCompany from "./components/company/company-linking.component";
 import BoardOwner from "./components/user/board-owner.component";
-import Company from "./components/company/company.component";
+import Company from "./components/company/company-create.component";
 
 import EventBus from "./common/EventBus";
 import CompanyUpdate from "./components/company/company-update.component";
@@ -104,8 +104,8 @@ class App extends Component<Props, State> {
 
                         {currentUser && (
                             <li className="nav-item">
-                                <Link to={"/user"} className="nav-link">
-                                    User
+                                <Link to={"/join-company"} className="nav-link">
+                                    Join company
                                 </Link>
                             </li>
                         )}
@@ -148,7 +148,7 @@ class App extends Component<Props, State> {
                         <Route path="/login" element={<Login/>}/>
                         <Route path="/register" element={<Register/>}/>
                         <Route path="/profile" element={<Profile/>}/>
-                        <Route path="/user" element={<BoardUser/>}/>
+                        <Route path="/join-company" element={<JoinCompany/>}/>
                         <Route path="/users" element={<BoardOwner/>}/>
                         <Route path="/company-create" element={<Company/>}/>
                         <Route path="/company-update" element={<CompanyUpdate/>}/>

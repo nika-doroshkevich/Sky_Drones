@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model, authenticate
 from django.utils import timezone
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 UserModel = get_user_model()
@@ -46,6 +47,17 @@ class UserLoginSerializer(TokenObtainPairSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(required=False)
+
     class Meta:
         model = UserModel
-        fields = ('id', 'title', 'email', 'username', 'phone', 'job_title', 'status', 'role')
+        fields = ('id', 'title', 'email', 'username', 'phone', 'job_title', 'status', 'role', 'company')
+
+    def update(self, instance, validated_data):
+        user = self.context['request'].user
+        if user.company_id is None:
+            instance.company = validated_data.get('company', instance.company)
+            instance.save()
+            return instance
+        else:
+            raise ValidationError({"detail": "You have already joined the company"})
