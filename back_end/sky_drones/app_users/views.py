@@ -75,6 +75,20 @@ class UserAPIUpdate(generics.UpdateAPIView):
         context['request'] = self.request
         return context
 
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        route_name = request.resolver_match.url_name
+
+        if route_name == 'join-company':
+            serializer.instance = serializer.join_company(instance, serializer.validated_data)
+
+        self.perform_update(serializer)
+
+        return Response(serializer.data)
+
 
 class AllView(APIView):
     def get(self, request):

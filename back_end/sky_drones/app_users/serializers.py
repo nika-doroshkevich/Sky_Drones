@@ -53,11 +53,12 @@ class UserSerializer(serializers.ModelSerializer):
         model = UserModel
         fields = ('id', 'title', 'email', 'username', 'phone', 'job_title', 'status', 'role', 'company')
 
-    def update(self, instance, validated_data):
+    def join_company(self, instance, validated_data):
         user = self.context['request'].user
         if user.company_id is None:
             instance.company = validated_data.get('company', instance.company)
             instance.save()
             return instance
         else:
-            raise ValidationError({"detail": "You have already joined the company"})
+            raise ValidationError({"detail": "You have already joined the company. "
+                                             "If you make a mistake, please contact an admin"})

@@ -17,7 +17,7 @@ class UserService {
 
     async joinCompany(id: number, email: string, company: number) {
         const authConfig = await authHeader();
-        return axios.put(API_URL + "user/" + id, {
+        return axios.put(API_URL + "join-company/" + id, {
             email,
             company
         }, authConfig);
