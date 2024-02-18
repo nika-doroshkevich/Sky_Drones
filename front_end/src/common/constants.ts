@@ -1,0 +1,33 @@
+export const titleOptions = [
+    {value: "Mr", label: "Mr"},
+    {value: "Ms", label: "Ms"},
+    {value: "Mx", label: "Mx"},
+];
+
+export const facilityTypeOptions = [
+    {value: "Aircraft", label: "Aircraft"},
+    {value: "Airport", label: "Airport"},
+    {value: "Bridges", label: "Bridges"},
+    {value: "Commercial Buildings", label: "Commercial Buildings"},
+    {value: "Construction", label: "Construction"},
+    {value: "Cranes", label: "Cranes"},
+    {value: "Dam", label: "Dam"},
+    {value: "Drilling Heads", label: "Drilling Heads"},
+    {value: "Electrical Pylons", label: "Electrical Pylons"},
+    {value: "Factories", label: "Factories"},
+    {value: "Mining Site", label: "Mining Site"},
+    {value: "Motorways", label: "Motorways"},
+    {value: "Nuclear", label: "Nuclear"},
+    {value: "Other", label: "Other"},
+    {value: "Pipeline", label: "Pipeline"},
+    {value: "Power Station", label: "Power Station"},
+    {value: "Railway", label: "Railway"},
+    {value: "Refineries", label: "Refineries"},
+    {value: "Solar Farms & Panels", label: "Solar Farms & Panels"},
+    {value: "Stockpile", label: "Stockpile"},
+    {value: "Storage Tanks", label: "Storage Tanks"},
+    {value: "Substation", label: "Substation"},
+    {value: "Telecom Tower & Mobile Cell Sites", label: "Telecom Tower & Mobile Cell Sites"},
+    {value: "Tunnels", label: "Tunnels"},
+    {value: "Wind Turbines", label: "Wind Turbines"},
+];

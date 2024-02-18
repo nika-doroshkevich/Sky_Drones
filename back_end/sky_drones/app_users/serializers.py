@@ -61,4 +61,4 @@ class UserSerializer(serializers.ModelSerializer):
             return instance
         else:
             raise ValidationError({"detail": "You have already joined the company. "
-                                             "If you make a mistake, please contact an admin"})
+                                             "If you made a mistake, please contact an admin"})

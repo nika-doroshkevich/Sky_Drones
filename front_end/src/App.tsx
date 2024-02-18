@@ -13,15 +13,17 @@ import Profile from "./components/user/profile.component";
 import JoinCompany from "./components/company/company-linking.component";
 import BoardOwner from "./components/user/board-owner.component";
 import Company from "./components/company/company-create.component";
+import CompanyUpdate from "./components/company/company-update.component";
+import FacilityCreate from "./components/facility-create.component";
 
 import EventBus from "./common/EventBus";
-import CompanyUpdate from "./components/company/company-update.component";
 
 type Props = {};
 
 type State = {
-    showOwnerBoard: boolean,
-    currentUser: IUser | undefined
+    currentUser: IUser | undefined,
+    customer: boolean,
+    showOwnerBoard: boolean
 }
 
 class App extends Component<Props, State> {
@@ -30,8 +32,9 @@ class App extends Component<Props, State> {
         this.logOut = this.logOut.bind(this);
 
         this.state = {
-            showOwnerBoard: false,
             currentUser: undefined,
+            customer: false,
+            showOwnerBoard: false
         };
     }
 
@@ -43,7 +46,8 @@ class App extends Component<Props, State> {
         if (user) {
             this.setState({
                 currentUser: user,
-                showOwnerBoard: user.role === "EMPLOYEE_OWNER" || user.role === "CUSTOMER_OWNER",
+                customer: user.role === "CUSTOMER_OWNER" || user.role === "CUSTOMER",
+                showOwnerBoard: user.role === "EMPLOYEE_OWNER" || user.role === "CUSTOMER_OWNER"
             });
         }
 
@@ -63,7 +67,7 @@ class App extends Component<Props, State> {
     }
 
     render() {
-        const {currentUser, showOwnerBoard} = this.state;
+        const {currentUser, showOwnerBoard, customer} = this.state;
 
         return (
             <div>
@@ -106,6 +110,14 @@ class App extends Component<Props, State> {
                             <li className="nav-item">
                                 <Link to={"/join-company"} className="nav-link">
                                     Join company
+                                </Link>
+                            </li>
+                        )}
+
+                        {customer && (
+                            <li className="nav-item">
+                                <Link to={"/facility-create"} className="nav-link">
+                                    New facility
                                 </Link>
                             </li>
                         )}
@@ -152,6 +164,7 @@ class App extends Component<Props, State> {
                         <Route path="/users" element={<BoardOwner/>}/>
                         <Route path="/company-create" element={<Company/>}/>
                         <Route path="/company-update" element={<CompanyUpdate/>}/>
+                        <Route path="/facility-create" element={<FacilityCreate/>}/>
                     </Routes>
                 </div>
 
