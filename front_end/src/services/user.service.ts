@@ -23,11 +23,20 @@ class UserService {
         }, authConfig);
     }
 
+    async makeUserInactive(id: number, email: string) {
+        const status = "INACTIVE";
+        const authConfig = await authHeader();
+        return axios.put(API_URL + "user/" + id, {
+            email,
+            status
+        }, authConfig);
+    }
+
     getPublicContent() {
         return axios.get(API_URL + 'all');
     }
 
-    async getUserBoard() {
+    async getUser() {
         return axios.get(API_URL + 'user', await authHeader());
     }
 

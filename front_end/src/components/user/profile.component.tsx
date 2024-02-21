@@ -1,4 +1,4 @@
-import {Component} from "react";
+import React, {Component} from "react";
 import {Navigate} from "react-router-dom";
 import AuthService from "../../services/login-register/auth.service";
 import IUser from "../../types/user.type";
@@ -8,6 +8,9 @@ import * as Yup from "yup";
 import UserService from "../../services/user.service";
 import InputField from "../../common/InputField";
 import SelectField from "../../common/SelectField";
+import {titleOptions} from "../../common/Constants";
+import ButtonSubmit from "../../common/ButtonSubmit";
+import Alert from "../../common/Alert";
 
 type Props = {};
 
@@ -80,7 +83,7 @@ export default class Profile extends Component<Props, State> {
         if (!currentUser) this.setState({redirect: "/home"});
         this.setState({currentUser: currentUser, userReady: true})
 
-        UserService.getUserBoard().then(
+        UserService.getUser().then(
             response => {
                 console.log("response " + response.status);
                 this.setState({
@@ -169,12 +172,6 @@ export default class Profile extends Component<Props, State> {
             role: this.state.role
         };
 
-        const titleOptions = [
-            {value: "Mr", label: "Mr"},
-            {value: "Ms", label: "Ms"},
-            {value: "Mx", label: "Mx"},
-        ];
-
         return (
             <div className="col-md-12">
                 <div className="card card-container">
@@ -195,30 +192,8 @@ export default class Profile extends Component<Props, State> {
                                     <InputField label="Job title" name="jobTitle" type="text"/>
                                     <InputField label="Role" name="role" type="text" disabled/>
 
-                                    <div className="form-group text-center mt-3">
-                                        <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
-                                            {loading && (
-                                                <span className="spinner-border spinner-border-sm"></span>
-                                            )}
-                                            <span>Update</span>
-                                        </button>
-                                    </div>
-
-                                    {successful ? (
-                                        <div className="form-group mt-3">
-                                            <div className="alert alert-success" role="alert">
-                                                {message}
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        message && (
-                                            <div className="form-group mt-3">
-                                                <div className="alert alert-danger" role="alert">
-                                                    {message}
-                                                </div>
-                                            </div>
-                                        )
-                                    )}
+                                    <ButtonSubmit loading={loading} buttonText="Update"/>
+                                    <Alert successful={successful} message={message}/>
 
                                 </Form>
                             </Formik>

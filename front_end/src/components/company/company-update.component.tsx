@@ -7,6 +7,7 @@ import {Form, Formik} from "formik";
 import * as Yup from "yup";
 import InputField from "../../common/InputField";
 import CompanyService from "../../services/company.service";
+import Alert from "../../common/Alert";
 
 type Props = {};
 
@@ -209,21 +210,7 @@ export default class CompanyUpdate extends Component<Props, State> {
                                         </button>
                                     </div>
 
-                                    {successful ? (
-                                        <div className="form-group mt-3">
-                                            <div className="alert alert-success" role="alert">
-                                                {message}
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        message && (
-                                            <div className="form-group mt-3">
-                                                <div className="alert alert-danger" role="alert">
-                                                    {message}
-                                                </div>
-                                            </div>
-                                        )
-                                    )}
+                                    <Alert successful={successful} message={message}/>
 
                                 </Form>
                             </Formik>

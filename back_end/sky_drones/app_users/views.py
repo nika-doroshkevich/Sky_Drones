@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-from sky_drones.utils import RoleBasedPermission
+from sky_drones.utils import RoleOwnerBasedPermission
 from .serializers import UserRegisterSerializer, UserLoginSerializer, UserSerializer
 
 UserModel = get_user_model()
@@ -14,28 +14,11 @@ class UserRegister(APIView):
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request):
-
-        email = request.data['email'].strip()
-        username = request.data['username'].strip()
-        password = request.data['password'].strip()
-
-        if not email or UserModel.objects.filter(email=email).exists():
-            return Response({"detail": "Please choose another email."}, status=status.HTTP_400_BAD_REQUEST)
-
-        if not password or len(password) < 8:
-            return Response({"detail": "Please choose another password, min 8 characters."},
-                            status=status.HTTP_400_BAD_REQUEST)
-
-        if not username:
-            return Response({"detail": "Please choose another username."}, status=status.HTTP_400_BAD_REQUEST)
-
         serializer = UserRegisterSerializer(data=request.data)
-
-        if serializer.is_valid(raise_exception=True):
-            user = serializer.create(request.data)
-            if user:
-                return Response(status=status.HTTP_201_CREATED)
-        return Response({"detail": "Failed to create user."}, status=status.HTTP_400_BAD_REQUEST)
+        user = serializer.create(request.data)
+        if user:
+            return Response(status=status.HTTP_201_CREATED)
+        return Response({"detail": "Failed to create user"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserLogin(TokenObtainPairView):
@@ -60,9 +43,14 @@ class UserView(APIView):
 
 
 class UserList(generics.ListAPIView):
-    permission_classes = (permissions.IsAuthenticated, RoleBasedPermission,)
+    permission_classes = (permissions.IsAuthenticated, RoleOwnerBasedPermission,)
     queryset = UserModel.objects.all()
     serializer_class = UserSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = UserModel.objects.filter(status='ACTIVE', company_id=user.company_id)
+        return queryset
 
 
 class UserAPIUpdate(generics.UpdateAPIView):

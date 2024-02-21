@@ -1,16 +1,19 @@
 import React, {Component} from "react";
 import {Navigate} from "react-router-dom";
-import IUser from "../types/user.type";
+import IUser from "../../types/user.type";
 import {Form, Formik} from "formik";
 import * as Yup from "yup";
-import InputField from "../common/InputField";
-import MapComponent from "./map.component";
-import FacilityService from "../services/facility.service";
-import SelectField from "../common/SelectField";
-import {facilityTypeOptions} from "../common/constants";
-import AuthService from "../services/login-register/auth.service";
-import Textarea from "../common/Textarea";
-import ButtonSubmit from "../common/ButtonSubmit";
+import InputField from "../../common/InputField";
+import MapComponent from "../map.component";
+import FacilityService from "../../services/facility.service";
+import SelectField from "../../common/SelectField";
+import {facilityTypeOptions} from "../../common/Constants";
+import AuthService from "../../services/login-register/auth.service";
+import Textarea from "../../common/Textarea";
+import ButtonSubmit from "../../common/ButtonSubmit";
+import Alert from "../../common/Alert";
+import UserService from "../../services/user.service";
+import EventBus from "../../common/EventBus";
 
 type Props = {};
 
@@ -74,6 +77,28 @@ export default class FacilityCreate extends Component<Props, State> {
 
         if (!currentUser) this.setState({redirect: "/home"});
         this.setState({currentUser: currentUser, userReady: true})
+
+        UserService.getUser().then(
+            response => {
+                this.setState({
+                    companyId: response.data.company
+                });
+            },
+            error => {
+                this.setState({
+                    message:
+                        (error.response &&
+                            error.response.data &&
+                            error.response.data.message) ||
+                        error.message ||
+                        error.toString()
+                });
+
+                if (error.response && error.response.status === 401) {
+                    EventBus.dispatch("logout");
+                }
+            }
+        );
     }
 
     handleCreate(formValue: {
@@ -121,7 +146,6 @@ export default class FacilityCreate extends Component<Props, State> {
     }
 
     handleMarkerPositionChange = (latitude: number, longitude: number) => {
-        console.log("Marker position:", latitude, longitude);
         this.setState({
             latitude,
             longitude
@@ -144,8 +168,6 @@ export default class FacilityCreate extends Component<Props, State> {
             location: "",
             description: ""
         };
-
-        console.log("lat + lng " + this.state.latitude + " " + this.state.longitude);
 
         return (
             <div className="col-md-12">
@@ -179,23 +201,7 @@ export default class FacilityCreate extends Component<Props, State> {
                                     <Textarea label="Description" name="description"/>
 
                                     <ButtonSubmit loading={loading} buttonText="Create"/>
-
-                                    {successful ? (
-                                        <div className="form-group mt-3">
-                                            <div className="alert alert-success" role="alert">
-                                                {message}
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        message && (
-                                            <div className="form-group mt-3">
-                                                <div className="alert alert-danger" role="alert">
-                                                    {message}
-                                                </div>
-                                            </div>
-                                        )
-                                    )}
-
+                                    <Alert successful={successful} message={message}/>
 
                                 </Form>
                             </Formik>

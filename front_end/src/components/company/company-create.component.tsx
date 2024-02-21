@@ -8,6 +8,8 @@ import * as Yup from "yup";
 import InputField from "../../common/InputField";
 import CompanyService from "../../services/company.service";
 import ICompany from "../../types/company.type";
+import Alert from "../../common/Alert";
+import ButtonSubmit from "../../common/ButtonSubmit";
 
 type Props = {};
 
@@ -205,30 +207,8 @@ export default class Company extends Component<Props, State> {
                                         />
                                     </div>
 
-                                    <div className="form-group text-center mt-3">
-                                        <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
-                                            {loading && (
-                                                <span className="spinner-border spinner-border-sm"></span>
-                                            )}
-                                            <span>Create</span>
-                                        </button>
-                                    </div>
-
-                                    {successful ? (
-                                        <div className="form-group mt-3">
-                                            <div className="alert alert-success" role="alert">
-                                                {message}
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        message && (
-                                            <div className="form-group mt-3">
-                                                <div className="alert alert-danger" role="alert">
-                                                    {message}
-                                                </div>
-                                            </div>
-                                        )
-                                    )}
+                                    <ButtonSubmit loading={loading} buttonText={"Create"}/>
+                                    <Alert successful={successful} message={message}/>
 
                                 </Form>
                             </Formik>

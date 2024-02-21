@@ -7,6 +7,7 @@ import AuthService from "../../services/login-register/auth.service";
 import CompanyService from "../../services/company.service";
 import {Navigate} from "react-router-dom";
 import Modal from "../../common/Modal";
+import Alert from "../../common/Alert";
 
 type Props = {};
 
@@ -180,21 +181,8 @@ export default class CompanyLinking extends Component<Props, State> {
                             ))}
                             </tbody>
                         </table>
-                        {successful ? (
-                            <div className="form-group mt-3">
-                                <div className="alert alert-success" role="alert">
-                                    {message}
-                                </div>
-                            </div>
-                        ) : (
-                            message && (
-                                <div className="form-group mt-3">
-                                    <div className="alert alert-danger" role="alert">
-                                        {message}
-                                    </div>
-                                </div>
-                            )
-                        )}
+
+                        <Alert successful={successful} message={message}/>
                     </header> : null}
             </div>
         );

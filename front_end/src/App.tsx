@@ -14,7 +14,7 @@ import JoinCompany from "./components/company/company-linking.component";
 import BoardOwner from "./components/user/board-owner.component";
 import Company from "./components/company/company-create.component";
 import CompanyUpdate from "./components/company/company-update.component";
-import FacilityCreate from "./components/facility-create.component";
+import FacilityCreate from "./components/facility/facility-create.component";
 
 import EventBus from "./common/EventBus";
 

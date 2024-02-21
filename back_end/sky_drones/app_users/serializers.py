@@ -12,10 +12,23 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         model = UserModel
         fields = '__all__'
 
-    def create(self, clean_data):
-        user_obj = UserModel.objects.create_user(email=clean_data['email'], password=clean_data['password'])
-        user_obj.username = clean_data['username']
-        user_obj.role = clean_data['role']
+    def create(self, attrs):
+        email = attrs.get('email')
+        username = attrs.get('username')
+        password = attrs.get('password')
+
+        if not email or UserModel.objects.filter(email=email).exists():
+            raise ValidationError({"detail": "Please choose another email"})
+
+        if not password or len(password) < 8:
+            raise ValidationError({"detail": "Please choose another password, min 8 characters"})
+
+        if not username:
+            raise ValidationError({"detail": "Please choose another username"})
+
+        user_obj = UserModel.objects.create_user(email=attrs['email'], password=attrs['password'])
+        user_obj.username = attrs['username']
+        user_obj.role = attrs['role']
         user_obj.save()
         return user_obj
 

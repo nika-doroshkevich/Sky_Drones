@@ -8,6 +8,7 @@ export const facilityTypeOptions = [
     {value: "Aircraft", label: "Aircraft"},
     {value: "Airport", label: "Airport"},
     {value: "Bridges", label: "Bridges"},
+    {value: "Buildings", label: "Buildings"},
     {value: "Commercial Buildings", label: "Commercial Buildings"},
     {value: "Construction", label: "Construction"},
     {value: "Cranes", label: "Cranes"},

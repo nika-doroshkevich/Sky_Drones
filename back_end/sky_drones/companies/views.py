@@ -4,7 +4,7 @@ from rest_framework import generics, permissions, status, serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from sky_drones.utils import RoleBasedPermission
+from sky_drones.utils import RoleOwnerBasedPermission
 from .models import Company
 from .serializers import CompanySerializer
 
@@ -28,7 +28,7 @@ class CompanyAPIList(generics.ListAPIView):
 
 
 class CompanyAPICreate(generics.CreateAPIView):
-    permission_classes = (permissions.IsAuthenticated, RoleBasedPermission,)
+    permission_classes = (permissions.IsAuthenticated, RoleOwnerBasedPermission,)
     queryset = Company.objects.all()
     serializer_class = CompanySerializer
 
@@ -39,7 +39,7 @@ class CompanyAPICreate(generics.CreateAPIView):
 
 
 class CompanyByUser(APIView):
-    permission_classes = (permissions.IsAuthenticated, RoleBasedPermission,)
+    permission_classes = (permissions.IsAuthenticated, RoleOwnerBasedPermission,)
 
     def get(self, request, pk):
         user = get_object_or_404(UserModel, pk=pk)
@@ -50,6 +50,6 @@ class CompanyByUser(APIView):
 
 
 class CompanyAPIRetrieveUpdate(generics.RetrieveUpdateAPIView):
-    permission_classes = (permissions.IsAuthenticated, RoleBasedPermission,)
+    permission_classes = (permissions.IsAuthenticated, RoleOwnerBasedPermission,)
     queryset = Company.objects.all()
     serializer_class = CompanySerializer
