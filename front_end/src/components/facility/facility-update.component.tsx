@@ -12,7 +12,6 @@ import AuthService from "../../services/login-register/auth.service";
 import Textarea from "../../common/Textarea";
 import ButtonSubmit from "../../common/ButtonSubmit";
 import Alert from "../../common/Alert";
-import UserService from "../../services/user.service";
 import EventBus from "../../common/EventBus";
 
 type Props = {};
@@ -25,14 +24,15 @@ type State = {
     message: string,
     successful: boolean,
 
-    latitude: any,
-    longitude: any,
+    id: any,
+    latitude: number,
+    longitude: number,
 
     name: string,
     type: string,
     location: string,
     description: string,
-    companyId: any
+    company: number
 }
 export default class FacilityCreate extends Component<Props, State> {
     constructor(props: Props) {
@@ -46,17 +46,18 @@ export default class FacilityCreate extends Component<Props, State> {
             message: "",
             successful: false,
 
-            latitude: "",
-            longitude: "",
+            id: null,
+            latitude: 0,
+            longitude: 0,
 
             name: "",
             type: "",
             location: "",
             description: "",
-            companyId: null
+            company: 0
         };
 
-        this.handleCreate = this.handleCreate.bind(this);
+        this.handleUpdate = this.handleUpdate.bind(this);
     }
 
     validationSchema() {
@@ -78,10 +79,22 @@ export default class FacilityCreate extends Component<Props, State> {
         if (!currentUser) this.setState({redirect: "/home"});
         this.setState({currentUser: currentUser, userReady: true})
 
-        UserService.getUser().then(
+        const facilityId = 1;
+
+        FacilityService.get(facilityId).then(
             response => {
+                const latitude = parseFloat(response.data.latitude);
+                const longitude = parseFloat(response.data.longitude);
+
                 this.setState({
-                    companyId: response.data.company
+                    id: response.data.id,
+                    latitude: latitude,
+                    longitude: longitude,
+                    name: response.data.name,
+                    type: response.data.type,
+                    location: response.data.location,
+                    description: response.data.description,
+                    company: response.data.company
                 });
             },
             error => {
@@ -101,30 +114,31 @@ export default class FacilityCreate extends Component<Props, State> {
         );
     }
 
-    handleCreate(formValue: {
+    handleUpdate(formValue: {
+        id: number;
         latitude: number;
         longitude: number;
         name: string;
         type: string;
         location: string;
-        description: string
+        description: string;
+        company: number
     }) {
-        const {latitude, longitude, name, type, location, description} = formValue;
+        const {id, latitude, longitude, name, type, location, description, company} = formValue;
         this.setState({
             message: "",
             successful: false
         });
 
-        let companyId = this.state.companyId;
-
-        FacilityService.create(
+        FacilityService.update(
+            id,
             latitude,
             longitude,
             name,
             type,
             location,
             description,
-            companyId
+            company
         ).then(
             () => {
                 this.setState({
@@ -158,15 +172,17 @@ export default class FacilityCreate extends Component<Props, State> {
             return <Navigate to={this.state.redirect}/>
         }
 
-        const {loading, message, successful} = this.state;
+        const {loading, message, successful, latitude, longitude} = this.state;
 
         const initialValues = {
+            id: this.state.id,
             latitude: this.state.latitude,
             longitude: this.state.longitude,
-            name: "",
-            type: "",
-            location: "",
-            description: ""
+            name: this.state.name,
+            type: this.state.type,
+            location: this.state.location,
+            description: this.state.description,
+            company: this.state.company
         };
 
         return (
@@ -175,17 +191,17 @@ export default class FacilityCreate extends Component<Props, State> {
                     <div className="row">
                         <div className="col-md-6">
                             <MapComponent
-                                latitude={53.9}
-                                longitude={27.5667}
+                                latitude={latitude}
+                                longitude={longitude}
                                 onMarkerPositionChange={this.handleMarkerPositionChange}
-                                isMarker={false}
+                                isMarker={true}
                             />
                         </div>
                         <div className="col-md-6">
                             <Formik
                                 initialValues={initialValues}
                                 validationSchema={this.validationSchema}
-                                onSubmit={this.handleCreate}
+                                onSubmit={this.handleUpdate}
                                 enableReinitialize
                             >
                                 <Form>
@@ -205,7 +221,7 @@ export default class FacilityCreate extends Component<Props, State> {
                                     <InputField label="Location" name="location" type="text"/>
                                     <Textarea label="Description" name="description"/>
 
-                                    <ButtonSubmit loading={loading} buttonText="Create"/>
+                                    <ButtonSubmit loading={loading} buttonText="Update"/>
                                     <Alert successful={successful} message={message}/>
 
                                 </Form>

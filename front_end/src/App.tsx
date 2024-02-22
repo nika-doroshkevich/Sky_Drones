@@ -15,6 +15,7 @@ import BoardOwner from "./components/user/board-owner.component";
 import Company from "./components/company/company-create.component";
 import CompanyUpdate from "./components/company/company-update.component";
 import FacilityCreate from "./components/facility/facility-create.component";
+import FacilityUpdate from "./components/facility/facility-update.component";
 
 import EventBus from "./common/EventBus";
 
@@ -121,6 +122,14 @@ class App extends Component<Props, State> {
                                 </Link>
                             </li>
                         )}
+
+                        {customer && (
+                            <li className="nav-item">
+                                <Link to={"/facility-update"} className="nav-link">
+                                    Update facility
+                                </Link>
+                            </li>
+                        )}
                     </div>
 
                     {currentUser ? (
@@ -165,6 +174,7 @@ class App extends Component<Props, State> {
                         <Route path="/company-create" element={<Company/>}/>
                         <Route path="/company-update" element={<CompanyUpdate/>}/>
                         <Route path="/facility-create" element={<FacilityCreate/>}/>
+                        <Route path="/facility-update" element={<FacilityUpdate/>}/>
                     </Routes>
                 </div>
 

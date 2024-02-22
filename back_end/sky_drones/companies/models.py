@@ -5,7 +5,7 @@ from sky_drones.utils import Statuses
 
 
 class Company(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, unique=True)
     status = models.CharField(max_length=10, choices=Statuses.choices(), default=Statuses.ACTIVE.value)
     phone = models.CharField(max_length=40)
     website = models.CharField(max_length=300, null=True)
