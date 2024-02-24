@@ -16,6 +16,8 @@ import Company from "./components/company/company-create.component";
 import CompanyUpdate from "./components/company/company-update.component";
 import FacilityCreate from "./components/facility/facility-create.component";
 import FacilityUpdate from "./components/facility/facility-update.component";
+import FacilityList from "./components/facility/facility-list.component";
+import FacilityMap from "./components/facility/facility-map.component";
 
 import EventBus from "./common/EventBus";
 
@@ -115,6 +117,22 @@ class App extends Component<Props, State> {
                             </li>
                         )}
 
+                        {currentUser && (
+                            <li className="nav-item">
+                                <Link to={"/facility-list"} className="nav-link">
+                                    Facility list
+                                </Link>
+                            </li>
+                        )}
+
+                        {currentUser && (
+                            <li className="nav-item">
+                                <Link to={"/facility-map"} className="nav-link">
+                                    Facility map
+                                </Link>
+                            </li>
+                        )}
+
                         {customer && (
                             <li className="nav-item">
                                 <Link to={"/facility-create"} className="nav-link">
@@ -123,13 +141,6 @@ class App extends Component<Props, State> {
                             </li>
                         )}
 
-                        {customer && (
-                            <li className="nav-item">
-                                <Link to={"/facility-update"} className="nav-link">
-                                    Update facility
-                                </Link>
-                            </li>
-                        )}
                     </div>
 
                     {currentUser ? (
@@ -174,7 +185,9 @@ class App extends Component<Props, State> {
                         <Route path="/company-create" element={<Company/>}/>
                         <Route path="/company-update" element={<CompanyUpdate/>}/>
                         <Route path="/facility-create" element={<FacilityCreate/>}/>
-                        <Route path="/facility-update" element={<FacilityUpdate/>}/>
+                        <Route path="/facility-update/:id" element={<FacilityUpdate/>}/>
+                        <Route path="/facility-list" element={<FacilityList/>}/>
+                        <Route path="/facility-map" element={<FacilityMap/>}/>
                     </Routes>
                 </div>
 

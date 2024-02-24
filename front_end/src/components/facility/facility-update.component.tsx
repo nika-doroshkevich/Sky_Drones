@@ -1,5 +1,5 @@
-import React, {Component} from "react";
-import {Navigate} from "react-router-dom";
+import React, {useEffect, useState} from "react";
+import {Navigate, useParams} from "react-router-dom";
 import IUser from "../../types/user.type";
 import {Form, Formik} from "formik";
 import * as Yup from "yup";
@@ -17,104 +17,110 @@ import EventBus from "../../common/EventBus";
 type Props = {};
 
 type State = {
-    redirect: string | null,
-    userReady: boolean,
-    currentUser: IUser & { access: string }
-    loading: boolean,
-    message: string,
-    successful: boolean,
+    redirect: string | null;
+    userReady: boolean;
+    currentUser: IUser & { access: string };
+    loading: boolean;
+    message: string;
+    successful: boolean;
 
-    id: any,
-    latitude: number,
-    longitude: number,
+    id: any;
+    latitude: number;
+    longitude: number;
 
-    name: string,
-    type: string,
-    location: string,
-    description: string,
-    company: number
-}
-export default class FacilityCreate extends Component<Props, State> {
-    constructor(props: Props) {
-        super(props);
+    name: string;
+    type: string;
+    location: string;
+    description: string;
+    company: number;
+};
 
-        this.state = {
-            redirect: null,
-            userReady: false,
-            currentUser: {access: ""},
-            loading: false,
-            message: "",
-            successful: false,
+const FacilityUpdate: React.FC<Props> = () => {
+    const [state, setState] = useState<State>({
+        redirect: null,
+        userReady: false,
+        currentUser: {access: ""},
+        loading: false,
+        message: "",
+        successful: false,
 
-            id: null,
-            latitude: 0,
-            longitude: 0,
+        id: null,
+        latitude: 0,
+        longitude: 0,
 
-            name: "",
-            type: "",
-            location: "",
-            description: "",
-            company: 0
-        };
+        name: "",
+        type: "",
+        location: "",
+        description: "",
+        company: 0,
+    });
 
-        this.handleUpdate = this.handleUpdate.bind(this);
-    }
+    const params = useParams<{ id: string }>();
+    const facilityId = parseInt(params.id || "0", 10);
 
-    validationSchema() {
-        return Yup.object().shape({
-            latitude: Yup.string()
-                .required("This field is required! Please point a location on the map."),
-            longitude: Yup.string()
-                .required("This field is required! Please point a location on the map."),
-            name: Yup.string()
-                .required("This field is required!"),
-            type: Yup.string()
-                .required("This field is required!"),
-        });
-    }
-
-    componentDidMount() {
+    useEffect(() => {
         const currentUser = AuthService.getCurrentUser();
 
-        if (!currentUser) this.setState({redirect: "/home"});
-        this.setState({currentUser: currentUser, userReady: true})
+        if (!currentUser) {
+            setState((prevState) => ({
+                ...prevState,
+                redirect: "/home",
+            }));
+        } else {
+            setState((prevState) => ({
+                ...prevState,
+                currentUser,
+                userReady: true,
+            }));
+        }
 
-        const facilityId = 1;
-
-        FacilityService.get(facilityId).then(
-            response => {
+        FacilityService.get(facilityId)
+            .then((response) => {
                 const latitude = parseFloat(response.data.latitude);
                 const longitude = parseFloat(response.data.longitude);
 
-                this.setState({
+                setState((prevState) => ({
+                    ...prevState,
                     id: response.data.id,
-                    latitude: latitude,
-                    longitude: longitude,
+                    latitude,
+                    longitude,
                     name: response.data.name,
                     type: response.data.type,
                     location: response.data.location,
                     description: response.data.description,
-                    company: response.data.company
-                });
-            },
-            error => {
-                this.setState({
-                    message:
-                        (error.response &&
-                            error.response.data &&
-                            error.response.data.message) ||
-                        error.message ||
-                        error.toString()
-                });
+                    company: response.data.company,
+                }));
+            })
+            .catch((error) => {
+                const resMessage =
+                    error.response?.data?.detail || error.message || error.toString();
+                console.log("resMessage " + resMessage);
+                setState((prevState) => ({
+                    ...prevState,
+                    successful: false,
+                    message: resMessage,
+                }));
 
                 if (error.response && error.response.status === 401) {
                     EventBus.dispatch("logout");
                 }
-            }
-        );
-    }
+            });
+    }, [facilityId]);
 
-    handleUpdate(formValue: {
+    const validationSchema = () => {
+        return Yup.object().shape({
+            latitude: Yup.string().required(
+                "This field is required! Please point a location on the map."
+            ),
+            longitude: Yup.string().required(
+                "This field is required! Please point a location on the map."
+            ),
+            name: Yup.string().required("This field is required!"),
+            type: Yup.string().required("This field is required!"),
+        });
+    };
+
+    const handleUpdate = (formValue: {
         id: number;
         latitude: number;
         longitude: number;
@@ -122,113 +128,106 @@ export default class FacilityCreate extends Component<Props, State> {
         type: string;
         location: string;
         description: string;
-        company: number
-    }) {
-        const {id, latitude, longitude, name, type, location, description, company} = formValue;
-        this.setState({
+        company: number;
+    }) => {
+        const {id, latitude, longitude, name, type, location, description, company} =
+            formValue;
+        setState((prevState) => ({
+            ...prevState,
             message: "",
-            successful: false
-        });
+            successful: false,
+        }));
 
-        FacilityService.update(
-            id,
-            latitude,
-            longitude,
-            name,
-            type,
-            location,
-            description,
-            company
-        ).then(
-            () => {
-                this.setState({
+        FacilityService.update(id, latitude, longitude, name, type, location, description, company)
+            .then(() => {
+                setState((prevState) => ({
+                    ...prevState,
                     message: "The data has been saved successfully!",
-                    successful: true
-                });
-            },
-            error => {
-                const resMessage = error.response.data.detail ||
-                    error.message ||
-                    error.toString();
+                    successful: true,
+                }));
+            })
+            .catch((error) => {
+                const resMessage =
+                    error.response?.data?.detail || error.message || error.toString();
                 console.log("resMessage " + resMessage);
-                this.setState({
+                setState((prevState) => ({
+                    ...prevState,
                     successful: false,
-                    message: resMessage
-                });
-            }
-        );
-    }
-
-    handleMarkerPositionChange = (latitude: number, longitude: number) => {
-        this.setState({
-            latitude,
-            longitude
-        });
+                    message: resMessage,
+                }));
+            });
     };
 
+    const handleMarkerPositionChange = (latitude: number, longitude: number) => {
+        setState((prevState) => ({
+            ...prevState,
+            latitude,
+            longitude,
+        }));
+    };
 
-    render() {
-        if (this.state.redirect) {
-            return <Navigate to={this.state.redirect}/>
-        }
+    const {loading, message, successful, latitude, longitude} = state;
 
-        const {loading, message, successful, latitude, longitude} = this.state;
+    const initialValues = {
+        id: state.id,
+        latitude: state.latitude,
+        longitude: state.longitude,
+        name: state.name,
+        type: state.type,
+        location: state.location,
+        description: state.description,
+        company: state.company,
+    };
 
-        const initialValues = {
-            id: this.state.id,
-            latitude: this.state.latitude,
-            longitude: this.state.longitude,
-            name: this.state.name,
-            type: this.state.type,
-            location: this.state.location,
-            description: this.state.description,
-            company: this.state.company
-        };
+    if (state.redirect) {
+        return <Navigate to={state.redirect}/>;
+    }
 
-        return (
-            <div className="col-md-12">
-                {(this.state.userReady) ?
-                    <div className="row">
-                        <div className="col-md-6">
-                            <MapComponent
-                                latitude={latitude}
-                                longitude={longitude}
-                                onMarkerPositionChange={this.handleMarkerPositionChange}
-                                isMarker={true}
-                            />
-                        </div>
-                        <div className="col-md-6">
-                            <Formik
-                                initialValues={initialValues}
-                                validationSchema={this.validationSchema}
-                                onSubmit={this.handleUpdate}
-                                enableReinitialize
-                            >
-                                <Form>
-                                    <div className="col-md-12">
-                                        <div className="row">
-                                            <div className="col-md-6">
-                                                <InputField label="Latitude" name="latitude" type="text"/>
-                                            </div>
-                                            <div className="col-md-6">
-                                                <InputField label="Longitude" name="longitude" type="text"/>
-                                            </div>
+    return (
+        <div className="col-md-12">
+            {state.userReady ? (
+                <div className="row">
+                    <div className="col-md-6">
+                        <MapComponent
+                            latitude={latitude}
+                            longitude={longitude}
+                            onMarkerPositionChange={handleMarkerPositionChange}
+                            isMarker={true}
+                        />
+                    </div>
+                    <div className="col-md-6">
+                        <Formik
+                            initialValues={initialValues}
+                            validationSchema={validationSchema}
+                            onSubmit={handleUpdate}
+                            enableReinitialize
+                        >
+                            <Form>
+                                <div className="col-md-12">
+                                    <div className="row">
+                                        <div className="col-md-6">
+                                            <InputField label="Latitude" name="latitude" type="text"/>
+                                        </div>
+                                        <div className="col-md-6">
+                                            <InputField label="Longitude" name="longitude" type="text"/>
                                         </div>
                                     </div>
+                                </div>
 
-                                    <InputField label="Name" name="name" type="text"/>
-                                    <SelectField label="Facility type" name="type" options={facilityTypeOptions}/>
-                                    <InputField label="Location" name="location" type="text"/>
-                                    <Textarea label="Description" name="description"/>
+                                <InputField label="Name" name="name" type="text"/>
+                                <SelectField label="Facility type" name="type" options={facilityTypeOptions}/>
+                                <InputField label="Location" name="location" type="text"/>
+                                <Textarea label="Description" name="description"/>
 
-                                    <ButtonSubmit loading={loading} buttonText="Update"/>
-                                    <Alert successful={successful} message={message}/>
+                                <ButtonSubmit loading={loading} buttonText="Update"/>
+                                <Alert successful={successful} message={message}/>
+                            </Form>
+                        </Formik>
+                    </div>
+                </div>
+            ) : null}
+        </div>
+    );
+};
 
-                                </Form>
-                            </Formik>
-                        </div>
-                    </div> : null}
-            </div>
-        );
-    }
-}
+export default FacilityUpdate;

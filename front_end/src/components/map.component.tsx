@@ -41,7 +41,7 @@ const MapComponent: React.FC<MapProps> = ({latitude, longitude, onMarkerPosition
     return (
         <div className="container">
             {latitude !== 0 && longitude !== 0 && (
-                <MapContainer center={[latitude, longitude]} zoom={10} style={{height: '400px'}}>
+                <MapContainer center={[latitude, longitude]} zoom={10} style={{height: '450px'}}>
                     <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"/>
                     <MapClickHandler/>
                     {markerPosition && (

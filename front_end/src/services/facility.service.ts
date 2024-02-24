@@ -37,6 +37,11 @@ class FacilityService {
         const authConfig = await authHeader();
         return axios.get(API_URL + "facility/" + id, authConfig);
     }
+
+    async getList() {
+        const authConfig = await authHeader();
+        return axios.get(API_URL + "facility-list", authConfig);
+    }
 }
 
 export default new FacilityService();

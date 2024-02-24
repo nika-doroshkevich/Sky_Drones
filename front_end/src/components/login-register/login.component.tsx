@@ -34,11 +34,8 @@ export default class Login extends Component<Props, State> {
         const currentUser = AuthService.getCurrentUser();
 
         if (currentUser) {
-            // this.setState({redirect: "/profile"});
-            console.log("currentUser " + JSON.stringify(currentUser));
             this.setState({redirect: ""});
         }
-        ;
     }
 
     componentWillUnmount() {
@@ -55,9 +52,6 @@ export default class Login extends Component<Props, State> {
     handleLogin(formValue: { email: string; password: string }) {
         const {email, password} = formValue;
 
-        console.log("formValue " + formValue);
-        console.log("email, password " + email + " " + password);
-
         this.setState({
             message: "",
             loading: true
@@ -67,8 +61,7 @@ export default class Login extends Component<Props, State> {
         AuthService.login(email, password).then(
             () => {
                 this.setState({
-                    redirect: "/profile"
-                    // redirect: "/home"
+                    redirect: "/facility-map"
                 });
             },
             error => {
