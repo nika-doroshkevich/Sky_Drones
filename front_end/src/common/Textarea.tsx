@@ -4,9 +4,10 @@ import {ErrorMessage, Field} from "formik";
 type InputFieldProps = {
     label: string;
     name: string;
+    readOnly?: boolean;
 };
 
-const Textarea: React.FC<InputFieldProps> = ({label, name}) => {
+const Textarea: React.FC<InputFieldProps> = ({label, name, readOnly}) => {
     return (
         <div className="form-group">
             <label htmlFor={name}>{label}</label>
@@ -15,6 +16,8 @@ const Textarea: React.FC<InputFieldProps> = ({label, name}) => {
                 name={name}
                 className="form-control"
                 rows="3"
+                placeholder={label}
+                readOnly={readOnly}
             />
             <ErrorMessage
                 name={name}

@@ -2,17 +2,13 @@ import React, {useEffect, useState} from "react";
 import {Navigate, useParams} from "react-router-dom";
 import IUser from "../../types/user.type";
 import {Form, Formik} from "formik";
-import * as Yup from "yup";
 import InputField from "../../common/InputField";
-import MapComponent from "../map.component";
 import FacilityService from "../../services/facility.service";
-import SelectField from "../../common/SelectField";
-import {facilityTypeOptions} from "../../common/Constants";
 import AuthService from "../../services/login-register/auth.service";
 import Textarea from "../../common/Textarea";
-import ButtonSubmit from "../../common/ButtonSubmit";
 import Alert from "../../common/Alert";
 import handleError from "../../common/errorHandler";
+import {MapContainer, Marker, Popup, TileLayer} from "react-leaflet";
 
 type Props = {};
 
@@ -82,8 +78,8 @@ const FacilityUpdate: React.FC<Props> = () => {
                 setState((prevState) => ({
                     ...prevState,
                     id: response.data.id,
-                    latitude,
-                    longitude,
+                    latitude: latitude,
+                    longitude: longitude,
                     name: response.data.name,
                     type: response.data.type,
                     location: response.data.location,
@@ -96,66 +92,7 @@ const FacilityUpdate: React.FC<Props> = () => {
             });
     }, [facilityId]);
 
-    const validationSchema = () => {
-        return Yup.object().shape({
-            latitude: Yup.string().required(
-                "This field is required! Please point a location on the map."
-            ),
-            longitude: Yup.string().required(
-                "This field is required! Please point a location on the map."
-            ),
-            name: Yup.string().required("This field is required!"),
-            type: Yup.string().required("This field is required!"),
-        });
-    };
-
-    const handleUpdate = (formValue: {
-        id: number;
-        latitude: number;
-        longitude: number;
-        name: string;
-        type: string;
-        location: string;
-        description: string;
-        company: number;
-    }) => {
-        const {id, latitude, longitude, name, type, location, description, company} =
-            formValue;
-        setState((prevState) => ({
-            ...prevState,
-            message: "",
-            successful: false,
-        }));
-
-        FacilityService.update(id, latitude, longitude, name, type, location, description, company)
-            .then(() => {
-                setState((prevState) => ({
-                    ...prevState,
-                    message: "The data has been saved successfully!",
-                    successful: true,
-                }));
-            })
-            .catch((error) => {
-                const resMessage =
-                    error.response?.data?.detail || error.message || error.toString();
-                console.log("resMessage " + resMessage);
-                setState((prevState) => ({
-                    ...prevState,
-                    successful: false,
-                    message: resMessage,
-                }));
-            });
-    };
-
-    const handleMarkerPositionChange = (latitude: number, longitude: number) => {
-        setState((prevState) => ({
-            ...prevState,
-            latitude,
-            longitude,
-        }));
-    };
-
-    const {loading, message, successful, latitude, longitude} = state;
+    const {message, successful, latitude, longitude} = state;
 
     const initialValues = {
         id: state.id,
@@ -177,39 +114,39 @@ const FacilityUpdate: React.FC<Props> = () => {
             {state.userReady ? (
                 <div className="row">
                     <div className="col-md-6">
-                        <MapComponent
-                            latitude={latitude}
-                            longitude={longitude}
-                            onMarkerPositionChange={handleMarkerPositionChange}
-                            isMarker={true}
-                            zoomValue={15}
-                        />
+                        {latitude !== 0 && longitude !== 0 && (
+                            <MapContainer center={[latitude, longitude]} zoom={15} style={{height: '450px'}}>
+                                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"/>
+                                <Marker position={[latitude, longitude]}>
+                                    <Popup>Your facility is here</Popup>
+                                </Marker>
+                            </MapContainer>
+                        )}
                     </div>
                     <div className="col-md-6">
                         <Formik
                             initialValues={initialValues}
-                            validationSchema={validationSchema}
-                            onSubmit={handleUpdate}
+                            onSubmit={() => {
+                            }}
                             enableReinitialize
                         >
                             <Form>
                                 <div className="col-md-12">
                                     <div className="row">
                                         <div className="col-md-6">
-                                            <InputField label="Latitude" name="latitude" type="text"/>
+                                            <InputField label="Latitude" name="latitude" type="text" readOnly={true}/>
                                         </div>
                                         <div className="col-md-6">
-                                            <InputField label="Longitude" name="longitude" type="text"/>
+                                            <InputField label="Longitude" name="longitude" type="text" readOnly={true}/>
                                         </div>
                                     </div>
                                 </div>
 
-                                <InputField label="Name" name="name" type="text"/>
-                                <SelectField label="Facility type" name="type" options={facilityTypeOptions}/>
-                                <InputField label="Location" name="location" type="text"/>
-                                <Textarea label="Description" name="description"/>
+                                <InputField label="Name" name="name" type="text" readOnly={true}/>
+                                <InputField label="Facility type" name="type" type="text" readOnly={true}/>
+                                <InputField label="Location" name="location" type="text" readOnly={true}/>
+                                <Textarea label="Description" name="description" readOnly={true}/>
 
-                                <ButtonSubmit loading={loading} buttonText="Update"/>
                                 <Alert successful={successful} message={message}/>
                             </Form>
                         </Formik>

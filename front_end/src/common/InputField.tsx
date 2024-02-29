@@ -6,13 +6,21 @@ type InputFieldProps = {
     name: string;
     type: string;
     disabled?: boolean;
+    readOnly?: boolean;
 };
 
-const InputField: React.FC<InputFieldProps> = ({label, name, type, disabled}) => {
+const InputField: React.FC<InputFieldProps> = ({label, name, type, disabled, readOnly}) => {
     return (
         <div className="form-group">
             <label htmlFor={name}>{label}</label>
-            <Field name={name} type={type} className="form-control" disabled={disabled}/>
+            <Field
+                name={name}
+                type={type}
+                className="form-control"
+                placeholder={label}
+                disabled={disabled}
+                readOnly={readOnly}
+            />
             <ErrorMessage
                 name={name}
                 component="div"

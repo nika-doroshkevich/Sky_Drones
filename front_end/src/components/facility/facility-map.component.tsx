@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from "react";
-import {Navigate} from "react-router-dom";
+import {Link, Navigate} from "react-router-dom";
 import IUser from "../../types/user.type";
 import FacilityService from "../../services/facility.service";
 import AuthService from "../../services/login-register/auth.service";
-import EventBus from "../../common/EventBus";
 import IFacility from "../../types/facility.type";
 import {MapContainer, Marker, Popup, TileLayer} from "react-leaflet";
+import handleError from "../../common/errorHandler";
 
 type Props = {};
 
@@ -76,18 +76,7 @@ const FacilityMap: React.FC<Props> = () => {
                 }));
             })
             .catch((error) => {
-                const resMessage =
-                    error.response?.data?.detail || error.message || error.toString();
-                console.log("resMessage " + resMessage);
-                setState((prevState) => ({
-                    ...prevState,
-                    successful: false,
-                    message: resMessage,
-                }));
-
-                if (error.response && error.response.status === 401) {
-                    EventBus.dispatch("logout");
-                }
+                handleError(error, setState);
             });
     }, []);
 
@@ -101,10 +90,15 @@ const FacilityMap: React.FC<Props> = () => {
                 <div className="container">
                     <MapContainer center={[53.9, 27.5667]} zoom={10} style={{height: '450px'}}>
                         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"/>
-                        {state.facilities.map((facility, index) => (
+                        {state.facilities.map((facility) => (
 
                             <Marker key={facility.id} position={[facility.latitude, facility.longitude]}>
-                                <Popup>Your facility is here</Popup>
+                                <Popup>
+                                    <Link to={`/facility-view/${facility.id}`}
+                                          className="btn btn-link btn-block">
+                                        <span>{facility.name}</span>
+                                    </Link>
+                                </Popup>
                             </Marker>
                         ))}
                     </MapContainer>

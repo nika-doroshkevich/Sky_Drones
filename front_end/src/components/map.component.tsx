@@ -10,9 +10,10 @@ interface MapProps {
     longitude: number;
     onMarkerPositionChange: (lat: number, lng: number) => void;
     isMarker: boolean;
+    zoomValue: number;
 }
 
-const MapComponent: React.FC<MapProps> = ({latitude, longitude, onMarkerPositionChange, isMarker}) => {
+const MapComponent: React.FC<MapProps> = ({latitude, longitude, onMarkerPositionChange, isMarker, zoomValue}) => {
     const [markerPosition, setMarkerPosition] =
         useState<{ lat: number, lng: number } | null>(null);
 
@@ -41,7 +42,7 @@ const MapComponent: React.FC<MapProps> = ({latitude, longitude, onMarkerPosition
     return (
         <div className="container">
             {latitude !== 0 && longitude !== 0 && (
-                <MapContainer center={[latitude, longitude]} zoom={10} style={{height: '450px'}}>
+                <MapContainer center={[latitude, longitude]} zoom={zoomValue} style={{height: '450px'}}>
                     <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"/>
                     <MapClickHandler/>
                     {markerPosition && (

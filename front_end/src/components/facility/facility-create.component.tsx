@@ -179,6 +179,7 @@ export default class FacilityCreate extends Component<Props, State> {
                                 longitude={27.5667}
                                 onMarkerPositionChange={this.handleMarkerPositionChange}
                                 isMarker={false}
+                                zoomValue={10}
                             />
                         </div>
                         <div className="col-md-6">

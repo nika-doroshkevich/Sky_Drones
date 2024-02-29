@@ -18,6 +18,8 @@ import FacilityCreate from "./components/facility/facility-create.component";
 import FacilityUpdate from "./components/facility/facility-update.component";
 import FacilityList from "./components/facility/facility-list.component";
 import FacilityMap from "./components/facility/facility-map.component";
+import FacilityView from "./components/facility/facility-view.component";
+import ImageUploader from "./components/ImageUploader";
 
 import EventBus from "./common/EventBus";
 
@@ -133,6 +135,14 @@ class App extends Component<Props, State> {
                             </li>
                         )}
 
+                        {currentUser && (
+                            <li className="nav-item">
+                                <Link to={"/ImageUploader"} className="nav-link">
+                                    ImageUploader
+                                </Link>
+                            </li>
+                        )}
+
                         {customer && (
                             <li className="nav-item">
                                 <Link to={"/facility-create"} className="nav-link">
@@ -188,6 +198,8 @@ class App extends Component<Props, State> {
                         <Route path="/facility-update/:id" element={<FacilityUpdate/>}/>
                         <Route path="/facility-list" element={<FacilityList/>}/>
                         <Route path="/facility-map" element={<FacilityMap/>}/>
+                        <Route path="/facility-view/:id" element={<FacilityView/>}/>
+                        <Route path="/ImageUploader" element={<ImageUploader/>}/>
                     </Routes>
                 </div>
 
