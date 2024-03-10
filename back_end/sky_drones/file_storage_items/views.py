@@ -3,6 +3,8 @@ from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from properties import ACCESS_KEY, SECRET_ACCESS_KEY, BUCKET_NAME
+
 
 class UploadImage(APIView):
     permission_classes = (permissions.AllowAny,)
@@ -20,8 +22,8 @@ class UploadImage(APIView):
 
 
 def upload_to_s3(file):
-    s3 = boto3.client('s3', aws_access_key_id='YOUR_ACCESS_KEY', aws_secret_access_key='YOUR_SECRET_KEY')
-    bucket_name = 'YOUR_BUCKET_NAME'
+    s3 = boto3.client('s3', aws_access_key_id=ACCESS_KEY, aws_secret_access_key=SECRET_ACCESS_KEY)
+    bucket_name = BUCKET_NAME
     file_name = file.name
     try:
         s3.upload_fileobj(file, bucket_name, file_name)

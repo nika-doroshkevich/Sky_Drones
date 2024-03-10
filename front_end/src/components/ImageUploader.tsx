@@ -1,6 +1,8 @@
 import React, {useState} from 'react';
 import axios from 'axios';
 
+const API_URL = "http://127.0.0.1:8000/sky-drones/";
+
 const ImageUploader: React.FC = () => {
     const [imageUrl, setImageUrl] = useState<string>('');
 
@@ -14,7 +16,7 @@ const ImageUploader: React.FC = () => {
         console.log(file);
 
         try {
-            const response = await axios.post<string>('/api/upload-image', formData, {
+            const response = await axios.post<string>(API_URL + 'upload-image', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },

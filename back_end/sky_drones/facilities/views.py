@@ -24,6 +24,18 @@ def get_facility_queryset(user):
     return result_queryset
 
 
+def get_one_facility(user):
+    user_company_id = user.company_id
+    queryset = Facility.objects.filter(company_id=user_company_id)
+
+    if not queryset:
+        inspected_companies_queryset = Company.objects.filter(inspecting_company_id=user_company_id)
+        for company in inspected_companies_queryset:
+            queryset = Facility.objects.filter(company_id=company.id)
+
+    return queryset
+
+
 class FacilityAPIList(generics.ListAPIView):
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = FacilitySerializer
@@ -39,7 +51,17 @@ class FacilityAPICreate(generics.CreateAPIView):
     serializer_class = FacilitySerializer
 
 
-class FacilityAPIRetrieveUpdate(generics.RetrieveUpdateAPIView):
+class FacilityAPIRetrieve(generics.RetrieveAPIView):
+    permission_classes = (permissions.IsAuthenticated,)
+    queryset = Facility.objects.all()
+    serializer_class = FacilitySerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        return get_one_facility(user)
+
+
+class FacilityAPIUpdate(generics.UpdateAPIView):
     permission_classes = (permissions.IsAuthenticated, RoleCustomerBasedPermission,)
     queryset = Facility.objects.all()
     serializer_class = FacilitySerializer
@@ -48,9 +70,3 @@ class FacilityAPIRetrieveUpdate(generics.RetrieveUpdateAPIView):
         context = super().get_serializer_context()
         context['request'] = self.request
         return context
-
-    def get_queryset(self):
-        user = self.request.user
-        user_company_id = user.company_id
-        queryset = Facility.objects.filter(company_id=user_company_id)
-        return queryset

@@ -89,6 +89,7 @@ export default class FacilityList extends Component<Props, State> {
                                 <th>Type</th>
                                 <th>Location</th>
                                 <th>Description</th>
+                                <th>View</th>
                                 {(currentUser.role === "CUSTOMER_OWNER" || currentUser.role === "CUSTOMER") && (
                                     <th>Update</th>
                                 )}
@@ -103,9 +104,18 @@ export default class FacilityList extends Component<Props, State> {
                                     <td>{facility.location}</td>
                                     <td>{facility.description}</td>
                                     <td>
+                                        <Link to={`/facility-view/${facility.id}`}
+                                              className="btn btn-primary btn-block">
+                                            {loading && (
+                                                <span className="spinner-border spinner-border-sm"></span>
+                                            )}
+                                            <span>View</span>
+                                        </Link>
+                                    </td>
+                                    <td>
                                         {(currentUser.role === "CUSTOMER_OWNER" || currentUser.role === "CUSTOMER") && (
                                             <Link to={`/facility-update/${facility.id}`}
-                                                  className="btn btn-primary btn-block">
+                                                  className="btn btn-secondary btn-block">
                                                 {loading && (
                                                     <span className="spinner-border spinner-border-sm"></span>
                                                 )}

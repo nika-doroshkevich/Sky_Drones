@@ -22,7 +22,7 @@ class FacilityService {
     async update(id: number, latitude: number, longitude: number, name: string, type: string, location: string,
                  description: string, company: number) {
         const authConfig = await authHeader();
-        return axios.put(API_URL + "facility/" + id, {
+        return axios.put(API_URL + "facility-update/" + id, {
             latitude,
             longitude,
             name,
