@@ -4,7 +4,7 @@ import IUser from "../../types/user.type";
 import {Form, Formik} from "formik";
 import * as Yup from "yup";
 import InputField from "../../common/InputField";
-import MapComponent from "../map.component";
+import MapComponent from "./map.component";
 import FacilityService from "../../services/facility.service";
 import SelectField from "../../common/SelectField";
 import {facilityTypeOptions} from "../../common/Constants";

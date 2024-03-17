@@ -1,28 +1,22 @@
 import React, {useEffect, useRef, useState} from 'react';
-import Carousel from "../common/Carousel";
-import './photo-editing.component.css';
+import Carousel from "./Carousel";
+import './facility-data.css';
+import ImageUploader from './ImageUploader';
 
-import image1 from '../photo/1.jpg';
-import image2 from '../photo/2.jpg';
-import image3 from '../photo/3.jpg';
-import image4 from '../photo/4.jpg';
-import image5 from '../photo/5.jpg';
-import image6 from '../photo/6.jpg';
-import image7 from '../photo/7.jpg';
-import image8 from '../photo/8.jpg';
+import line from '../icons/line.png';
+import circle from '../icons/circle.png';
+import square from '../icons/square.png';
+import arrow from '../icons/arrow.png';
+import {useParams} from "react-router-dom";
 
-import line from './icons/line.png';
-import circle from './icons/circle.png';
-import square from './icons/square.png';
-import arrow from './icons/arrow.png';
-
-const PhotoEditing: React.FC = () => {
+const FacilityData: React.FC = () => {
+    const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+    const {facilityId} = useParams<{ facilityId: string }>();
     const [isDrawing, setIsDrawing] = useState(false);
     const [lineWidth, setLineWidth] = useState(10);
     const [currentColor, setCurrentColor] = useState('#000000');
     const [tool, setTool] = useState('line');
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const images = [image1, image2, image3, image4, image5, image6, image7, image8];
     const initialRadius = 10;
     const [circleCenter, setCircleCenter] = useState({x: 0, y: 0});
     const [circleRadius, setCircleRadius] = useState(initialRadius);
@@ -42,7 +36,7 @@ const PhotoEditing: React.FC = () => {
                 ctx.strokeStyle = currentColor;
             }
         }
-    }, [lineWidth, currentColor]);
+    }, [uploadedImages, lineWidth, currentColor]);
 
     const handleMouseDown = (event: React.MouseEvent<HTMLCanvasElement>) => {
         const canvas = canvasRef.current;
@@ -256,11 +250,20 @@ const PhotoEditing: React.FC = () => {
         event.preventDefault();
     };
 
+    const handleImagesUploaded = (urls: string[]) => {
+        setUploadedImages(urls);
+    };
+
     return (
         <div>
-            <Carousel images={images}/>
+            <Carousel images={uploadedImages}/>
             <div className="mainContainer">
                 <div className="tools">
+                    <div>
+                        <ImageUploader facilityId={facilityId ? parseInt(facilityId) : 0} images={uploadedImages}
+                                       onImagesUploaded={handleImagesUploaded}/>
+                    </div>
+
                     <div>
                         <button onClick={() => handleToolChange("line")} className="button">
                             <img src={line} alt="line" className="icon"/>
@@ -309,4 +312,4 @@ const PhotoEditing: React.FC = () => {
     );
 };
 
-export default PhotoEditing;
+export default FacilityData;

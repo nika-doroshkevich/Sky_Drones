@@ -17,9 +17,10 @@ const ImageWithCheckbox: React.FC<{ src: string; onClick: () => void; isSelected
     };
 
     return (
-        <div className={`image-container ${isSelected ? 'selected' : ''}`} onClick={onClick} draggable onDragStart={handleDragStart}>
+        <div className={`image-container ${isSelected ? 'selected' : ''}`} onClick={onClick} draggable
+             onDragStart={handleDragStart}>
             <div className="image-wrapper">
-                <img src={src} alt="carousel-image" className="image" />
+                <img src={src} alt="carousel-image" className="image"/>
                 {isSelected && <div className="circle checkmark">&#10003;</div>}
             </div>
         </div>

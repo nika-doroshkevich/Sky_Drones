@@ -5,7 +5,7 @@ import FacilityService from "../../services/facility.service";
 import AuthService from "../../services/login-register/auth.service";
 import IFacility from "../../types/facility.type";
 import {MapContainer, Marker, Popup, TileLayer} from "react-leaflet";
-import handleError from "../../common/errorHandler";
+import handleError from "../../common/ErrorHandler";
 
 type Props = {};
 

@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Navigate, useParams} from "react-router-dom";
+import {Link, Navigate, useParams} from "react-router-dom";
 import IUser from "../../types/user.type";
 import {Form, Formik} from "formik";
 import InputField from "../../common/InputField";
@@ -7,7 +7,7 @@ import FacilityService from "../../services/facility.service";
 import AuthService from "../../services/login-register/auth.service";
 import Textarea from "../../common/Textarea";
 import Alert from "../../common/Alert";
-import handleError from "../../common/errorHandler";
+import handleError from "../../common/ErrorHandler";
 import {MapContainer, Marker, Popup, TileLayer} from "react-leaflet";
 
 type Props = {};
@@ -92,7 +92,7 @@ const FacilityUpdate: React.FC<Props> = () => {
             });
     }, [facilityId]);
 
-    const {message, successful, latitude, longitude} = state;
+    const {message, successful, latitude, longitude, currentUser} = state;
 
     const initialValues = {
         id: state.id,
@@ -131,6 +131,15 @@ const FacilityUpdate: React.FC<Props> = () => {
                             enableReinitialize
                         >
                             <Form>
+                                {(currentUser.role === "EMPLOYEE_OWNER" || currentUser.role === "EMPLOYEE") && (
+                                    <div className="text-center">
+                                        <Link to={`/facility-data/${facilityId}`}
+                                              className="btn btn-secondary btn-block">
+                                            <span>Add data</span>
+                                        </Link>
+                                    </div>
+                                )}
+
                                 <div className="col-md-12">
                                     <div className="row">
                                         <div className="col-md-6">

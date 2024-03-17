@@ -19,8 +19,7 @@ import FacilityUpdate from "./components/facility/facility-update.component";
 import FacilityList from "./components/facility/facility-list.component";
 import FacilityMap from "./components/facility/facility-map.component";
 import FacilityView from "./components/facility/facility-view.component";
-import ImageUploader from "./components/ImageUploader";
-import PhotoEditing from "./components/photo-editing.component";
+import FacilityData from "./components/facility-data/facility-data.component";
 
 import EventBus from "./common/EventBus";
 
@@ -55,7 +54,6 @@ class App extends Component<Props, State> {
             this.setState({
                 currentUser: user,
                 customer: user.role === "CUSTOMER_OWNER" || user.role === "CUSTOMER",
-                employee: user.role === "EMPLOYEE_OWNER" || user.role === "EMPLOYEE",
                 showOwnerBoard: user.role === "EMPLOYEE_OWNER" || user.role === "CUSTOMER_OWNER"
             });
         }
@@ -72,14 +70,12 @@ class App extends Component<Props, State> {
         this.setState({
             currentUser: undefined,
             customer: false,
-            employee: false,
             showOwnerBoard: false,
-
         });
     }
 
     render() {
-        const {currentUser, showOwnerBoard, customer, employee} = this.state;
+        const {currentUser, showOwnerBoard, customer} = this.state;
 
         return (
             <div>
@@ -142,22 +138,6 @@ class App extends Component<Props, State> {
                             </li>
                         )}
 
-                        {employee && (
-                            <li className="nav-item">
-                                <Link to={"/ImageUploader"} className="nav-link">
-                                    ImageUploader
-                                </Link>
-                            </li>
-                        )}
-
-                        {employee && (
-                            <li className="nav-item">
-                                <Link to={"/photo-editing"} className="nav-link">
-                                    Photo editing
-                                </Link>
-                            </li>
-                        )}
-
                         {customer && (
                             <li className="nav-item">
                                 <Link to={"/facility-create"} className="nav-link">
@@ -214,12 +194,9 @@ class App extends Component<Props, State> {
                         <Route path="/facility-list" element={<FacilityList/>}/>
                         <Route path="/facility-map" element={<FacilityMap/>}/>
                         <Route path="/facility-view/:id" element={<FacilityView/>}/>
-                        <Route path="/ImageUploader" element={<ImageUploader/>}/>
-                        <Route path="/photo-editing" element={<PhotoEditing/>}/>
+                        <Route path="/facility-data/:facilityId" element={<FacilityData/>}/>
                     </Routes>
                 </div>
-
-                { /*<AuthVerify logOut={this.logOut}/> */}
             </div>
         );
     }

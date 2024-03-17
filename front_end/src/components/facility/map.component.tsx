@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {MapContainer, Marker, Popup, TileLayer, useMapEvents} from 'react-leaflet';
 import L from 'leaflet';
-import "./Map.css";
+import "./map.css";
 
 L.Icon.Default.imagePath = "https://unpkg.com/leaflet@1.5.0/dist/images/";
 
