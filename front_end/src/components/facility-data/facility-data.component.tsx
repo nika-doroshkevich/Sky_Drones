@@ -250,8 +250,8 @@ const FacilityData: React.FC = () => {
         event.preventDefault();
     };
 
-    const handleImagesUploaded = (urls: string[]) => {
-        setUploadedImages(urls);
+    const handleImagesUploaded = (data: any) => {
+        setUploadedImages(data.image_urls);
     };
 
     return (

@@ -14,6 +14,10 @@ class ImageUploadDownloadService {
             },
         });
     }
+
+    async get(facility_id: number) {
+        return axios.get<string[]>(API_URL + 'get-images/' + facility_id, await authHeader());
+    }
 }
 
 export default new ImageUploadDownloadService();

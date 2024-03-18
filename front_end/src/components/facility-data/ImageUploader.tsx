@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect} from 'react';
 import ImageUploadDownloadService from "../../services/image-upload-download.service";
 import './ImageUploader.css';
 
@@ -8,8 +8,12 @@ interface ImageUploaderProps {
     facilityId: number;
 }
 
-const ImageUploader: React.FC<ImageUploaderProps> = ({images, facilityId}) => {
-    const [imageUrls, setImageUrls] = useState<string[]>(images);
+const ImageUploader: React.FC<ImageUploaderProps> = ({facilityId, onImagesUploaded}) => {
+
+    useEffect(() => {
+        getImages().then(_ => {
+        });
+    }, [facilityId]);
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
@@ -22,9 +26,18 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({images, facilityId}) => {
 
         try {
             await ImageUploadDownloadService.upload(formData, facilityId);
-            //setImageUrls(response.data);
+            await getImages();
         } catch (error) {
             console.error('Error uploading images:', error);
+        }
+    };
+
+    const getImages = async () => {
+        try {
+            const response = await ImageUploadDownloadService.get(facilityId);
+            onImagesUploaded(response.data);
+        } catch (error) {
+            console.error('Error getting images:', error);
         }
     };
 
@@ -34,7 +47,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({images, facilityId}) => {
                 <input name="file" type="file" id="input_file" className="input input_file" onChange={handleFileChange}
                        multiple/>
                 <label htmlFor="input_file" className="input_file-button">
-                    <span className="input_file-button-text">Choose images</span>
+                    <span className="input_file-button-text">Upload images</span>
                 </label>
             </div>
         </div>
