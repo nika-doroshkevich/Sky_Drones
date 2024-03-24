@@ -29,9 +29,20 @@
     background-color: white;
     border: 1px solid #000000;
     margin-bottom: 5px;
+    margin-top: 20px;
 }
 
 .icon {
     width: 25px;
     height: 25px;
+}
+
+.save-button {
+    padding: 10px 20px;
+    background: #ccc;
+    color: #333;
+    border: white;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 25px;
 }

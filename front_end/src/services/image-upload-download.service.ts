@@ -18,6 +18,15 @@ class ImageUploadDownloadService {
     async get(facility_id: number) {
         return axios.get<string[]>(API_URL + 'get-images/' + facility_id, await authHeader());
     }
+
+    async sendElements(drawn_elements: any[], selected_image_url: string, facility_id: number) {
+        const authConfig = await authHeader();
+        return axios.post(API_URL + "metadata", {
+            drawn_elements,
+            selected_image_url,
+            facility_id
+        }, authConfig);
+    }
 }
 
 export default new ImageUploadDownloadService();

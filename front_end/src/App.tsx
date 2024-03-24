@@ -48,8 +48,6 @@ class App extends Component<Props, State> {
     componentDidMount() {
         const user = AuthService.getCurrentUser();
 
-        console.log("user" + JSON.stringify(user));
-
         if (user) {
             this.setState({
                 currentUser: user,

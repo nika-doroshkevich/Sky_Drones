@@ -32,3 +32,30 @@ export const facilityTypeOptions = [
     {value: "Tunnels", label: "Tunnels"},
     {value: "Wind Turbines", label: "Wind Turbines"},
 ];
+
+interface ScaledLineWidth {
+    [key: number]: number;
+}
+
+export const scaledLineWidth: ScaledLineWidth = {
+    1: 1.3,
+    2: 2.3,
+    3: 3.3,
+    4: 4.5,
+    5: 7,
+    6: 8.4,
+    7: 9.1,
+    8: 10.1,
+    9: 11.7,
+    10: 13,
+    11: 14.1,
+    12: 15.2,
+    13: 16,
+    14: 16.8,
+    15: 18,
+    16: 18.9,
+    17: 20.1,
+    18: 21.4,
+    19: 22.7,
+    20: 24
+}
