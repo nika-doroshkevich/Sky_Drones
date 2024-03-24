@@ -12,6 +12,7 @@ from wand.color import Color
 from wand.drawing import Drawing
 from wand.image import Image
 
+from companies.models import Company
 from facilities.models import Facility
 from file_storage_items.models import FileStorageItem
 from file_storage_items.serializers import FileStorageItemSerializer
@@ -23,65 +24,87 @@ class UploadImages(APIView):
     permission_classes = (permissions.IsAuthenticated, RoleEmployeeBasedPermission,)
 
     def post(self, request, facility_id):
-        files = request.FILES.getlist('images')
-        if files:
-            uploaded_files = []
-            for file in files:
-                unique_filename = str(uuid.uuid4())
-                url = upload_to_s3(file, unique_filename)
-                if url:
-                    file_instance = save_file_storage_item_to_db(unique_filename, url, facility_id)
-                    uploaded_files.append(file_instance)
-                else:
-                    return Response({'error': 'Failed to upload files to S3'},
-                                    status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        user = self.request.user
+        if check_users_ability_to_access_facility(user, facility_id):
+            files = request.FILES.getlist('images')
+            if files:
+                uploaded_files = []
+                for file in files:
+                    unique_filename = str(uuid.uuid4())
+                    url = upload_to_s3(file, unique_filename)
+                    if url:
+                        file_instance = save_file_storage_item_to_db(unique_filename, url, facility_id)
+                        uploaded_files.append(file_instance)
+                    else:
+                        return Response({'error': 'Failed to upload images to S3'},
+                                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-            serializer = FileStorageItemSerializer(uploaded_files, many=True)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+                serializer = FileStorageItemSerializer(uploaded_files, many=True)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+            else:
+                return Response({'error': 'No images found'}, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response({'error': 'No files found'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Failed to upload images'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ImagesList(APIView):
     permission_classes = (permissions.IsAuthenticated, RoleEmployeeBasedPermission,)
 
     def get(self, request, facility_id):
-        image_urls = get_images_urls_from_database(facility_id)
-        if image_urls:
-            return Response({'image_urls': image_urls}, status=status.HTTP_200_OK)
+        user = self.request.user
+        if check_users_ability_to_access_facility(user, facility_id):
+            image_urls = get_images_urls_from_database(facility_id)
+            if image_urls:
+                return Response({'image_urls': image_urls}, status=status.HTTP_200_OK)
+            else:
+                return Response({'error': "Error getting images"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
-            return Response({'error': "Error getting images"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'error': 'No images found'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ImageOverlay(APIView):
     permission_classes = (permissions.IsAuthenticated, RoleEmployeeBasedPermission,)
 
     def post(self, request):
-        input_image = request.data.get('selected_image_url')
-        elements = request.data.get('drawn_elements')
         facility_id = request.data.get('facility_id')
+        user = self.request.user
+        if check_users_ability_to_access_facility(user, facility_id):
+            input_image = request.data.get('selected_image_url')
+            elements = request.data.get('drawn_elements')
 
-        input_image_file = download_image_from_s3(input_image)
-        if input_image_file:
-            img_buffer = draw_elements_on_image(input_image_file, elements)
+            input_image_file = download_image_from_s3(input_image)
+            if input_image_file:
+                img_buffer = draw_elements_on_image(input_image_file, elements)
 
-            unique_filename = str(uuid.uuid4())
-            url_of_modified_image = upload_to_s3(img_buffer, unique_filename)
+                unique_filename = str(uuid.uuid4())
+                url_of_modified_image = upload_to_s3(img_buffer, unique_filename)
 
-            if url_of_modified_image:
-                save_file_storage_item_to_db(unique_filename, url_of_modified_image, facility_id)
+                if url_of_modified_image:
+                    save_file_storage_item_to_db(unique_filename, url_of_modified_image, facility_id)
+                else:
+                    return Response({'error': 'Failed to upload image to S3'},
+                                    status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+                key = get_key_from_url(url_of_modified_image)
+                image_url = get_generated_presigned_url(key)
+
+                return Response({'image_url': image_url}, status=status.HTTP_200_OK)
             else:
-                return Response({'error': 'Failed to upload file to S3'},
+                return Response({'error': 'Error downloading image from S3'},
                                 status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-            key = get_key_from_url(url_of_modified_image)
-            image_url = get_generated_presigned_url(key)
-
-            return Response({'image_url': image_url}, status=status.HTTP_200_OK)
         else:
-            return Response({'error': 'Error downloading image from S3'},
-                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'error': 'Failed to save image'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+def check_users_ability_to_access_facility(user, facility_id):
+    facility = Facility.objects.get(id=facility_id)
+    inspected_company_queryset = Company.objects.filter(inspecting_company_id=user.company_id)
+    check = False
+    for company in inspected_company_queryset:
+        check = check or company.id == facility.company_id
+
+    return check
 
 
 def upload_to_s3(file, unique_filename):
@@ -92,7 +115,7 @@ def upload_to_s3(file, unique_filename):
         url = f"https://{bucket_name}.s3.amazonaws.com/{unique_filename}"
         return url
     except Exception as e:
-        print("Error uploading file to S3:", e)
+        print("Error uploading image to S3:", e)
         return None
 
 
