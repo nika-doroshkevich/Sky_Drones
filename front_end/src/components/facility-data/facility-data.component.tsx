@@ -10,6 +10,13 @@ import arrow from '../icons/arrow.png';
 import {useParams} from "react-router-dom";
 import ImageUploadDownloadService from "../../services/image-upload-download.service";
 import {scaledLineWidth} from "../../common/Constants";
+import handleError from "../../common/ErrorHandler";
+import Alert from "../../common/Alert";
+
+type State = {
+    message: string;
+    successful: boolean;
+};
 
 const FacilityData: React.FC = () => {
     const [uploadedImages, setUploadedImages] = useState<string[]>([]);
@@ -31,6 +38,10 @@ const FacilityData: React.FC = () => {
     const [lineEndPos, setLineEndPos] = useState({x: 0, y: 0});
     const [drawnElements, setDrawnElements] = useState<any[]>([]);
     const [selectedImageUrl, setSelectedImageUrl] = useState<string>("");
+    const [state, setState] = useState<State>({
+        message: "",
+        successful: false
+    });
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -284,17 +295,19 @@ const FacilityData: React.FC = () => {
         setUploadedImages(data.image_urls);
     };
 
-    const saveCanvasImage = async (facilityId: number) => {
-        try {
-            const response = await ImageUploadDownloadService.sendElements(drawnElements, selectedImageUrl, facilityId);
-            const newImageUrl = response.data.image_url;
-            const updatedImages = [...uploadedImages, newImageUrl];
-            setUploadedImages(updatedImages);
-
-        } catch (error) {
-            console.error('Error sending image:', error);
-        }
+    const saveCanvasImage = (facilityId: number) => {
+        ImageUploadDownloadService.sendElements(drawnElements, selectedImageUrl, facilityId)
+            .then((response) => {
+                const newImageUrl = response.data.image_url;
+                const updatedImages = [...uploadedImages, newImageUrl];
+                setUploadedImages(updatedImages);
+            })
+            .catch((error) => {
+                handleError(error, setState);
+            });
     };
+
+    const {message, successful} = state;
 
     return (
         <div>
@@ -340,6 +353,8 @@ const FacilityData: React.FC = () => {
                                 onClick={() => saveCanvasImage(facilityId ? parseInt(facilityId) : 0)}>Save image
                         </button>
                     </div>
+
+                    <Alert successful={successful} message={message}/>
                 </div>
 
                 <div className="container">

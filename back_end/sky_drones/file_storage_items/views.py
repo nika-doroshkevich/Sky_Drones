@@ -36,16 +36,16 @@ class UploadImages(APIView):
                         file_instance = save_file_storage_item_to_db(unique_filename, url, facility_id)
                         uploaded_files.append(file_instance)
                     else:
-                        return Response({'error': 'Failed to upload images to S3'},
+                        return Response({'detail': 'Failed to upload images to S3'},
                                         status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
                 serializer = FileStorageItemSerializer(uploaded_files, many=True)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
 
             else:
-                return Response({'error': 'No images found'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'detail': 'No images found'}, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response({'error': 'Failed to upload images'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'detail': 'Failed to upload images'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ImagesList(APIView):
@@ -58,9 +58,9 @@ class ImagesList(APIView):
             if image_urls:
                 return Response({'image_urls': image_urls}, status=status.HTTP_200_OK)
             else:
-                return Response({'error': "Error getting images"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                return Response({'detail': "Error getting images"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
-            return Response({'error': 'No images found'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'detail': 'No images found'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ImageOverlay(APIView):
@@ -83,7 +83,7 @@ class ImageOverlay(APIView):
                 if url_of_modified_image:
                     save_file_storage_item_to_db(unique_filename, url_of_modified_image, facility_id)
                 else:
-                    return Response({'error': 'Failed to upload image to S3'},
+                    return Response({'detail': 'Failed to upload image to S3'},
                                     status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
                 key = get_key_from_url(url_of_modified_image)
@@ -91,10 +91,10 @@ class ImageOverlay(APIView):
 
                 return Response({'image_url': image_url}, status=status.HTTP_200_OK)
             else:
-                return Response({'error': 'Error downloading image from S3'},
+                return Response({'detail': 'Error downloading image from S3'},
                                 status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
-            return Response({'error': 'Failed to save image'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'detail': 'Failed to save image'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 def check_users_ability_to_access_facility(user, facility_id):
