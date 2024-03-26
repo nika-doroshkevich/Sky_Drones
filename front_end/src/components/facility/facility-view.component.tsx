@@ -31,7 +31,7 @@ type State = {
     company: number;
 };
 
-const FacilityUpdate: React.FC<Props> = () => {
+const FacilityView: React.FC<Props> = () => {
     const [state, setState] = useState<State>({
         redirect: null,
         userReady: false,
@@ -166,4 +166,4 @@ const FacilityUpdate: React.FC<Props> = () => {
     );
 };
 
-export default FacilityUpdate;
+export default FacilityView;

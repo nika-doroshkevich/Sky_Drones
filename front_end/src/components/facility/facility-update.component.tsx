@@ -136,14 +136,7 @@ const FacilityUpdate: React.FC<Props> = () => {
                 }));
             })
             .catch((error) => {
-                const resMessage =
-                    error.response?.data?.detail || error.message || error.toString();
-                console.log("resMessage " + resMessage);
-                setState((prevState) => ({
-                    ...prevState,
-                    successful: false,
-                    message: resMessage,
-                }));
+                handleError(error, setState);
             });
     };
 
