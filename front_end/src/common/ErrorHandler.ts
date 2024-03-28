@@ -11,6 +11,7 @@ const handleError = (error: {
         ...prevState,
         successful: false,
         message: resMessage,
+        loading: false,
     }));
 
     if (error.response && error.response.status === 401) {

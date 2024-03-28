@@ -35,7 +35,7 @@ export default class BoardOwner extends Component<Props, State> {
     }
 
     componentDidMount() {
-        UserService.getOwnerBoard().then(
+        UserService.getList().then(
             response => {
                 this.setState({
                     user: response.data

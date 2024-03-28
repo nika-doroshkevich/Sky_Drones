@@ -20,6 +20,9 @@ import FacilityList from "./components/facility/facility-list.component";
 import FacilityMap from "./components/facility/facility-map.component";
 import FacilityView from "./components/facility/facility-view.component";
 import FacilityData from "./components/facility-data/facility-data.component";
+import InspectionCreate from "./components/inspection/inspection-create.component";
+import InspectionList from "./components/inspection/inspection-list.component";
+import InspectionView from "./components/inspection/inspection-view-update.component";
 
 import EventBus from "./common/EventBus";
 
@@ -28,7 +31,6 @@ type Props = {};
 type State = {
     currentUser: IUser | undefined,
     customer: boolean,
-    employee: boolean,
     showOwnerBoard: boolean
 }
 
@@ -40,7 +42,6 @@ class App extends Component<Props, State> {
         this.state = {
             currentUser: undefined,
             customer: false,
-            employee: false,
             showOwnerBoard: false
         };
     }
@@ -144,6 +145,14 @@ class App extends Component<Props, State> {
                             </li>
                         )}
 
+                        {currentUser && (
+                            <li className="nav-item">
+                                <Link to={"/inspection-list"} className="nav-link">
+                                    Inspection list
+                                </Link>
+                            </li>
+                        )}
+
                     </div>
 
                     {currentUser ? (
@@ -193,6 +202,9 @@ class App extends Component<Props, State> {
                         <Route path="/facility-map" element={<FacilityMap/>}/>
                         <Route path="/facility-view/:id" element={<FacilityView/>}/>
                         <Route path="/facility-data/:facilityId" element={<FacilityData/>}/>
+                        <Route path="/request-an-inspection" element={<InspectionCreate/>}/>
+                        <Route path="/inspection-list" element={<InspectionList/>}/>
+                        <Route path="/inspection-view/:id" element={<InspectionView/>}/>
                     </Routes>
                 </div>
             </div>

@@ -33,6 +33,18 @@ export const facilityTypeOptions = [
     {value: "Wind Turbines", label: "Wind Turbines"},
 ];
 
+export const inspectionPriorityOptions = [
+    {value: "HIGH", label: "HIGH"},
+    {value: "MEDIUM", label: "MEDIUM"},
+    {value: "LOW", label: "LOW"},
+];
+
+export enum InspectionStatus {
+    CREATED = "CREATED",
+    IN_PROCESS = "IN_PROCESS",
+    DONE = "DONE"
+}
+
 interface ScaledLineWidth {
     [key: number]: number;
 }

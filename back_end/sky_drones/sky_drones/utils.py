@@ -17,6 +17,11 @@ class RoleOwnerBasedPermission(BasePermission):
         return request.user.role in ['EMPLOYEE_OWNER', 'CUSTOMER_OWNER']
 
 
+class RoleCustomerOwnerBasedPermission(BasePermission):
+    def has_permission(self, request, view):
+        return request.user.role in ['CUSTOMER_OWNER']
+
+
 class RoleCustomerBasedPermission(BasePermission):
     def has_permission(self, request, view):
         return request.user.role in ['CUSTOMER_OWNER', 'CUSTOMER']

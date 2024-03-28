@@ -26,4 +26,5 @@ urlpatterns = [
     path('sky-drones/', include('companies.urls')),
     path('sky-drones/', include('facilities.urls')),
     path('sky-drones/', include('file_storage_items.urls')),
+    path('sky-drones/', include('inspections.urls')),
 ]

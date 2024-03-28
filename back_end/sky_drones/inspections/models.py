@@ -14,8 +14,7 @@ class Inspection(models.Model):
                               related_name='inspections_as_pilot')
     inspector = models.ForeignKey(AppUser, blank=True, null=True, on_delete=models.PROTECT,
                                   related_name='inspections_as_inspector')
-    status = models.CharField(max_length=10, choices=InspectionStatus.choices())
-    comment = models.TextField(blank=True, null=True)
+    status = models.CharField(max_length=10, choices=InspectionStatus.choices(), default=InspectionStatus.CREATED.value)
 
     def __str__(self):
         return self.name

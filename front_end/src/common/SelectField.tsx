@@ -4,7 +4,7 @@ import {ErrorMessage, Field} from "formik";
 type SelectFieldProps = {
     label: string;
     name: string;
-    options: { value: string; label: string }[];
+    options: { value: string | number, label: string }[];
 };
 
 const SelectField: React.FC<SelectFieldProps> = ({label, name, options}) => {
@@ -16,7 +16,7 @@ const SelectField: React.FC<SelectFieldProps> = ({label, name, options}) => {
                 as="select"
                 className="form-control"
             >
-                <option value="" disabled>Select a {label.toLowerCase()}</option>
+                <option value="" disabled>Select {label.toLowerCase()}</option>
                 {options.map((option) => (
                     <option key={option.value} value={option.value}>
                         {option.label}

@@ -33,15 +33,15 @@ class UserService {
     }
 
     getPublicContent() {
-        return axios.get(API_URL + 'all');
+        return axios.get(API_URL + "all");
     }
 
     async getUser() {
-        return axios.get(API_URL + 'user', await authHeader());
+        return axios.get(API_URL + "user", await authHeader());
     }
 
-    async getOwnerBoard() {
-        return axios.get(API_URL + 'users', await authHeader());
+    async getList() {
+        return axios.get(API_URL + "users", await authHeader());
     }
 }
 

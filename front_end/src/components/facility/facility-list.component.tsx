@@ -13,7 +13,6 @@ type State = {
     redirect: string | null,
     userReady: boolean,
     currentUser: IUser & { access: string }
-    loading: boolean,
     message: string,
     successful: boolean,
     isModalOpen: boolean,
@@ -30,7 +29,6 @@ export default class FacilityList extends Component<Props, State> {
             redirect: null,
             userReady: false,
             currentUser: {access: ""},
-            loading: false,
             message: "",
             successful: false,
             isModalOpen: false,
@@ -74,7 +72,7 @@ export default class FacilityList extends Component<Props, State> {
             return <Navigate to={this.state.redirect}/>
         }
 
-        const {loading, message, successful, currentUser} = this.state;
+        const {message, successful, currentUser} = this.state;
 
         return (
             <div className="container">
@@ -106,9 +104,6 @@ export default class FacilityList extends Component<Props, State> {
                                     <td>
                                         <Link to={`/facility-view/${facility.id}`}
                                               className="btn btn-primary btn-block">
-                                            {loading && (
-                                                <span className="spinner-border spinner-border-sm"></span>
-                                            )}
                                             <span>View</span>
                                         </Link>
                                     </td>
@@ -116,9 +111,6 @@ export default class FacilityList extends Component<Props, State> {
                                         {(currentUser.role === "CUSTOMER_OWNER" || currentUser.role === "CUSTOMER") && (
                                             <Link to={`/facility-update/${facility.id}`}
                                                   className="btn btn-secondary btn-block">
-                                                {loading && (
-                                                    <span className="spinner-border spinner-border-sm"></span>
-                                                )}
                                                 <span>Update</span>
                                             </Link>
                                         )}
