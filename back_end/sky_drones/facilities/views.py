@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework import generics, permissions
 
-from companies.models import Company
+from sky_drones.mixins import UserRightsCorrespondingCheckMixin
 from sky_drones.utils import RoleCustomerBasedPermission
 from .models import Facility
 from .serializers import FacilitySerializer
@@ -9,40 +9,13 @@ from .serializers import FacilitySerializer
 UserModel = get_user_model()
 
 
-def get_facility_queryset(user):
-    user_company_id = user.company_id
-
-    inspected_companies_queryset = Company.objects.filter(inspecting_company_id=user_company_id)
-    queryset_for_inspecting = Facility.objects.none()
-    for company in inspected_companies_queryset:
-        temp_queryset = Facility.objects.filter(company_id=company.id)
-        queryset_for_inspecting = queryset_for_inspecting.union(temp_queryset)
-
-    queryset_for_inspected = Facility.objects.filter(company_id=user_company_id)
-
-    result_queryset = queryset_for_inspected.union(queryset_for_inspecting)
-    return result_queryset
-
-
-def get_one_facility(user):
-    user_company_id = user.company_id
-    queryset = Facility.objects.filter(company_id=user_company_id)
-
-    if not queryset:
-        inspected_companies_queryset = Company.objects.filter(inspecting_company_id=user_company_id)
-        for company in inspected_companies_queryset:
-            queryset = Facility.objects.filter(company_id=company.id)
-
-    return queryset
-
-
-class FacilityAPIList(generics.ListAPIView):
+class FacilityAPIList(generics.ListAPIView, UserRightsCorrespondingCheckMixin):
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = FacilitySerializer
 
     def get_queryset(self):
         user = self.request.user
-        return get_facility_queryset(user)
+        return self.get_facilities_list(user)
 
 
 class FacilityAPICreate(generics.CreateAPIView):
@@ -51,14 +24,14 @@ class FacilityAPICreate(generics.CreateAPIView):
     serializer_class = FacilitySerializer
 
 
-class FacilityAPIRetrieve(generics.RetrieveAPIView):
+class FacilityAPIRetrieve(generics.RetrieveAPIView, UserRightsCorrespondingCheckMixin):
     permission_classes = (permissions.IsAuthenticated,)
     queryset = Facility.objects.all()
     serializer_class = FacilitySerializer
 
     def get_queryset(self):
         user = self.request.user
-        return get_one_facility(user)
+        return self.get_one_facility(user)
 
 
 class FacilityAPIUpdate(generics.UpdateAPIView):
