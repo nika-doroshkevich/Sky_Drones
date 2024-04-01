@@ -22,7 +22,8 @@ import FacilityView from "./components/facility/facility-view.component";
 import FacilityData from "./components/facility-data/facility-data.component";
 import InspectionCreate from "./components/inspection/inspection-create.component";
 import InspectionList from "./components/inspection/inspection-list.component";
-import InspectionView from "./components/inspection/inspection-view-update.component";
+import InspectionViewUpdate from "./components/inspection/inspection-view-update.component";
+import DefectList from "./components/order/defect-list.component";
 
 import EventBus from "./common/EventBus";
 
@@ -204,7 +205,8 @@ class App extends Component<Props, State> {
                         <Route path="/facility-data/:facilityId" element={<FacilityData/>}/>
                         <Route path="/request-an-inspection" element={<InspectionCreate/>}/>
                         <Route path="/inspection-list" element={<InspectionList/>}/>
-                        <Route path="/inspection-view/:id" element={<InspectionView/>}/>
+                        <Route path="/inspection-view/:id" element={<InspectionViewUpdate/>}/>
+                        <Route path="/defect-list" element={<DefectList/>}/>
                     </Routes>
                 </div>
             </div>

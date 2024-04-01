@@ -25,7 +25,7 @@
     height: 100%;
 }
 
-.button {
+.tool-button {
     background-color: white;
     border: 1px solid #000000;
     margin-bottom: 5px;
@@ -37,12 +37,20 @@
     height: 25px;
 }
 
-.save-button {
+.button {
     padding: 10px 20px;
-    background: #ccc;
-    color: #333;
     border: white;
     border-radius: 5px;
     cursor: pointer;
     margin-top: 25px;
+}
+
+.save-button {
+    background: #ccc;
+    color: #333;
+}
+
+.report-button {
+    background: #6c757d;
+    color: white;
 }

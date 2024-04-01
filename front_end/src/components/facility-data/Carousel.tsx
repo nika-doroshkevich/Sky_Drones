@@ -5,6 +5,7 @@ const imageNumber = 7;
 
 interface CarouselProps {
     images: string[];
+    onImagesSelected: (selectedPhotos: string[]) => void;
 }
 
 const ImageWithCheckbox: React.FC<{ src: string; onClick: () => void; isSelected: boolean }> = ({
@@ -28,16 +29,19 @@ const ImageWithCheckbox: React.FC<{ src: string; onClick: () => void; isSelected
 };
 
 
-const Carousel: React.FC<CarouselProps> = ({images}) => {
+const Carousel: React.FC<CarouselProps> = ({images, onImagesSelected}) => {
     const [selectedImages, setSelectedImages] = useState<boolean[]>(Array(images.length).fill(false));
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [isStart, setIsStart] = useState(true);
     const [isEnd, setIsEnd] = useState(false);
 
+    const selectedPhotos = images.filter((_, index) => selectedImages[index + currentImageIndex]);
+
     useEffect(() => {
         setIsStart(currentImageIndex === 0);
         setIsEnd(currentImageIndex + imageNumber >= images.length);
-    }, [currentImageIndex, images]);
+        onImagesSelected(selectedPhotos);
+    }, [currentImageIndex, images, selectedPhotos, onImagesSelected]);
 
     const goToPreviousSlide = () => {
         const newIndex = currentImageIndex - 1;

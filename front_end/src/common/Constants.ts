@@ -39,6 +39,13 @@ export const inspectionPriorityOptions = [
     {value: "LOW", label: "LOW"},
 ];
 
+export const defectSeverityOptions = [
+    {value: "CRITICAL", label: "CRITICAL"},
+    {value: "MAJOR", label: "MAJOR"},
+    {value: "MINOR", label: "MINOR"},
+    {value: "TRIVIAL", label: "TRIVIAL"},
+];
+
 export enum InspectionStatus {
     CREATED = "CREATED",
     IN_PROCESS = "IN_PROCESS",

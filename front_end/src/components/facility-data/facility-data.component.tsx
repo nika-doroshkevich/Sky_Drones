@@ -7,7 +7,7 @@ import line from '../icons/line.png';
 import circle from '../icons/circle.png';
 import square from '../icons/square.png';
 import arrow from '../icons/arrow.png';
-import {useParams} from "react-router-dom";
+import {Link, useParams} from "react-router-dom";
 import ImageUploadDownloadService from "../../services/image-upload-download.service";
 import {scaledLineWidth} from "../../common/Constants";
 import handleError from "../../common/ErrorHandler";
@@ -309,9 +309,13 @@ const FacilityData: React.FC = () => {
 
     const {message, successful} = state;
 
+    const handleImagesSelected = (selectedImages: string[]) => {
+        localStorage.setItem('selectedImagesForReport', JSON.stringify(selectedImages));
+    };
+
     return (
         <div>
-            <Carousel images={uploadedImages}/>
+            <Carousel images={uploadedImages} onImagesSelected={handleImagesSelected}/>
             <div className="mainContainer">
                 <div className="tools">
                     <div>
@@ -320,16 +324,16 @@ const FacilityData: React.FC = () => {
                     </div>
 
                     <div>
-                        <button onClick={() => handleToolChange("line")} className="button">
+                        <button onClick={() => handleToolChange("line")} className="tool-button">
                             <img src={line} alt="line" className="icon"/>
                         </button>
-                        <button onClick={() => handleToolChange("circle")} className="button">
+                        <button onClick={() => handleToolChange("circle")} className="tool-button">
                             <img src={circle} alt="circle" className="icon"/>
                         </button>
-                        <button onClick={() => handleToolChange("square")} className="button">
+                        <button onClick={() => handleToolChange("square")} className="tool-button">
                             <img src={square} alt="square" className="icon"/>
                         </button>
-                        <button onClick={() => handleToolChange("arrow")} className="button">
+                        <button onClick={() => handleToolChange("arrow")} className="tool-button">
                             <img src={arrow} alt="arrow" className="icon"/>
                         </button>
                     </div>
@@ -349,10 +353,15 @@ const FacilityData: React.FC = () => {
                     <input type="range" min="1" max="20" value={lineWidth} onChange={handleChangeLineWidth}/>
 
                     <div>
-                        <button className="save-button"
+                        <button className="button save-button"
                                 onClick={() => saveCanvasImage(facilityId ? parseInt(facilityId) : 0)}>Save image
                         </button>
                     </div>
+
+                    <Link to={'/defect-list'}
+                          className="btn button report-button">
+                        <span>Do report</span>
+                    </Link>
 
                     <Alert successful={successful} message={message}/>
                 </div>
