@@ -73,7 +73,11 @@ const DefectList: React.FC<Props> = () => {
             successful: false,
         }));
 
-        DefectService.create(imagesUrls, defects)
+        for (let index = 0; index < defectsNumber; index++) {
+            defects[index].imageUrl = imagesUrls[index];
+        }
+
+        DefectService.create(defects)
             .then(() => {
                 setState((prevState) => ({
                     ...prevState,
@@ -123,7 +127,7 @@ const DefectList: React.FC<Props> = () => {
                         >
                             <Form>
                                 {generateFields()}
-                                <ButtonSubmit buttonText="Submit"/>
+                                <ButtonSubmit buttonText="Next"/>
                                 <Alert successful={successful} message={message}/>
                             </Form>
                         </Formik>

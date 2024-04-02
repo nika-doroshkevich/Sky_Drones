@@ -360,7 +360,7 @@ const FacilityData: React.FC = () => {
 
                     <Link to={'/defect-list'}
                           className="btn button report-button">
-                        <span>Do report</span>
+                        <span>Analysis</span>
                     </Link>
 
                     <Alert successful={successful} message={message}/>
