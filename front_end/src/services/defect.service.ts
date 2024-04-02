@@ -6,11 +6,12 @@ const API_URL = "http://127.0.0.1:8000/sky-drones/";
 
 class DefectService {
 
-    async create(defectsArray: IDefect[]) {
+    async create(defectsArray: IDefect[], inspectionId: number) {
         const defects = JSON.stringify(defectsArray);
         const authConfig = await authHeader();
         return axios.post(API_URL + "defects-create", {
-            defects
+            defects,
+            inspectionId
         }, authConfig);
     }
 }

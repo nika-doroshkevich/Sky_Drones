@@ -13,6 +13,9 @@ import ButtonSubmit from "../../common/ButtonSubmit";
 import IDefect from "../../types/defect.type";
 import handleError from "../../common/ErrorHandler";
 import DefectService from "../../services/defect.service";
+import IInspection from "../../types/inspection.type";
+import InspectionService from "../../services/inspection.service";
+import * as Yup from "yup";
 
 type Props = {};
 
@@ -24,7 +27,9 @@ type State = {
     message: string;
     successful: boolean;
 
-    defects: IDefect[]
+    defects: IDefect[];
+    inspection: any;
+    inspections: IInspection[]
 };
 
 const DefectList: React.FC<Props> = () => {
@@ -38,7 +43,9 @@ const DefectList: React.FC<Props> = () => {
         message: "",
         successful: false,
 
-        defects: []
+        defects: [],
+        inspection: null,
+        inspections: []
     });
 
     useEffect(() => {
@@ -61,12 +68,40 @@ const DefectList: React.FC<Props> = () => {
         setImagesUrls(selectedImages);
         setDefectsNumber(selectedImages.length);
 
+        InspectionService.getList()
+            .then((response) => {
+                setState((prevState) => ({
+                    ...prevState,
+                    inspections: response.data,
+                }));
+            })
+            .catch((error) => {
+                handleError(error, setState);
+            });
+
     }, []);
 
+    const validationSchema = () => {
+        return Yup.object().shape({
+            inspection: Yup.string().required("This field is required!"),
+            defects: Yup.array().of(Yup.object().shape({
+                name: Yup.string()
+                    .test(
+                        "len",
+                        "The name must be a maximum of 50 characters.",
+                        (val: any) => val.toString().length <= 50)
+                    .required("Name is required!"),
+                severity: Yup.string().required("Severity is required!"),
+                description: Yup.string().required("Description is required!")
+            }))
+        });
+    };
+
     const handleSubmit = (formValue: {
+        inspection: any;
         defects: IDefect[]
     }) => {
-        const {defects} = formValue;
+        const {inspection, defects} = formValue;
         setState((prevState) => ({
             ...prevState,
             message: "",
@@ -77,7 +112,7 @@ const DefectList: React.FC<Props> = () => {
             defects[index].imageUrl = imagesUrls[index];
         }
 
-        DefectService.create(defects)
+        DefectService.create(defects, inspection)
             .then(() => {
                 setState((prevState) => ({
                     ...prevState,
@@ -106,7 +141,7 @@ const DefectList: React.FC<Props> = () => {
         return fields;
     };
 
-    const {message, successful, currentUser} = state;
+    const {message, successful} = state;
 
     if (state.redirect) {
         return <Navigate to={state.redirect}/>;
@@ -120,12 +155,22 @@ const DefectList: React.FC<Props> = () => {
                         <h3 className="text-center">Description of defects</h3>
                         <Formik
                             initialValues={{
+                                inspection: state.inspection || "",
                                 defects: Array.from({length: defectsNumber}, () =>
                                     ({name: "", severity: "", description: ""}))
                             }}
+                            validationSchema={validationSchema}
                             onSubmit={handleSubmit}
                         >
                             <Form>
+                                <SelectField
+                                    label="Inspection"
+                                    name="inspection"
+                                    options={state.inspections.map(inspection => ({
+                                        value: inspection.id,
+                                        label: inspection.name!
+                                    }))}
+                                />
                                 {generateFields()}
                                 <ButtonSubmit buttonText="Next"/>
                                 <Alert successful={successful} message={message}/>

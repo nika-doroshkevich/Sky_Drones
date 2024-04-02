@@ -2,6 +2,7 @@ from django.db import models
 
 from defects.utils import DefectSeverity
 from file_storage_items.models import FileStorageItem
+from inspections.models import Inspection
 
 
 class Defect(models.Model):
@@ -9,6 +10,7 @@ class Defect(models.Model):
     severity = models.CharField(max_length=10, choices=DefectSeverity.choices())
     description = models.TextField()
     file_storage_item = models.ForeignKey(FileStorageItem, on_delete=models.PROTECT)
+    inspection = models.ForeignKey(Inspection, on_delete=models.PROTECT)
 
     def __str__(self):
         return self.name

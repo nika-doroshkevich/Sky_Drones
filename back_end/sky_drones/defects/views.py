@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from file_storage_items.models import FileStorageItem
+from inspections.models import Inspection
 from sky_drones.utils import RoleEmployeeBasedPermission
 from .models import Defect
 from .serializers import DefectSerializer
@@ -22,6 +23,8 @@ class DefectAPICreate(APIView):
     def post(self, request):
         defects = request.data.get('defects')
         defects_data = json.loads(defects)
+        inspection_id = request.data.get('inspectionId')
+        inspection = Inspection.objects.get(id=inspection_id)
 
         for defect in defects_data:
             image_url = defect.get('imageUrl')
@@ -36,7 +39,8 @@ class DefectAPICreate(APIView):
                 name=name,
                 severity=severity,
                 description=description,
-                file_storage_item=file_storage_item)
+                file_storage_item=file_storage_item,
+                inspection=inspection)
 
             if not new_defect:
                 return Response({"detail": "Error saving defects"}, status=status.HTTP_400_BAD_REQUEST)
