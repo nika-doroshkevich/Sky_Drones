@@ -118,6 +118,7 @@ const DefectList: React.FC<Props> = () => {
                     ...prevState,
                     message: "The data has been saved successfully!",
                     successful: true,
+                    redirect: `/inspection-view/${inspection}`
                 }));
             })
             .catch((error) => {

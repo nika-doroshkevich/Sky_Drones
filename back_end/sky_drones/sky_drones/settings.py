@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'file_storage_items.apps.FileStorageItemsConfig',
     'inspections.apps.InspectionsConfig',
     'defects.apps.DefectsConfig',
+    'reports.apps.ReportsConfig',
 ]
 
 MIDDLEWARE = [

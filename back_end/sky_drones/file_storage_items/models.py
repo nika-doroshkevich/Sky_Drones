@@ -13,3 +13,11 @@ class FileStorageItem(models.Model):
 
     def __str__(self):
         return self.file_name
+
+
+class Template(models.Model):
+    name = models.CharField(max_length=100)
+    file_storage_item = models.OneToOneField(FileStorageItem, on_delete=models.PROTECT)
+
+    def __str__(self):
+        return self.name

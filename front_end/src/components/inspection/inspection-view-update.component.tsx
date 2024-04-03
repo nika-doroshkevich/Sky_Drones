@@ -14,6 +14,7 @@ import SelectField from "../../common/SelectField";
 import * as Yup from "yup";
 import ButtonSubmit from "../../common/ButtonSubmit";
 import Modal from "../../common/Modal";
+import ReportService from "../../services/report.service";
 
 type Props = {};
 
@@ -28,6 +29,7 @@ type State = {
     id: any;
     name: string;
     reason: string;
+    facility: any;
     facility_name: string;
     priority: string;
     pilot: any;
@@ -51,6 +53,7 @@ const InspectionView: React.FC<Props> = () => {
         id: null,
         name: "",
         reason: "",
+        facility: null,
         facility_name: "",
         priority: "",
         pilot: null,
@@ -88,6 +91,7 @@ const InspectionView: React.FC<Props> = () => {
                     id: response.data.id,
                     name: response.data.name,
                     reason: response.data.reason,
+                    facility: response.data.facility,
                     facility_name: response.data.facility_name,
                     priority: response.data.priority,
                     pilot_username: response.data.pilot_username,
@@ -144,6 +148,27 @@ const InspectionView: React.FC<Props> = () => {
                     message: "The data has been saved successfully!",
                     successful: true,
                     redirect: "/inspection-list"
+                }));
+            })
+            .catch((error) => {
+                handleError(error, setState);
+            });
+    };
+
+    const handleDoReport = () => {
+        setState((prevState) => ({
+            ...prevState,
+            message: "",
+            successful: false,
+        }));
+
+        const inspectionId = state.id;
+        ReportService.create(inspectionId)
+            .then(() => {
+                setState((prevState) => ({
+                    ...prevState,
+                    message: "The data has been saved successfully!",
+                    successful: true,
                 }));
             })
             .catch((error) => {
@@ -278,10 +303,16 @@ const InspectionView: React.FC<Props> = () => {
 
                                 {(state.status === InspectionStatus.IN_PROCESS &&
                                     (state.currentUser.role === "EMPLOYEE_OWNER" || state.currentUser.role === "EMPLOYEE")) && (
-                                    <ButtonSubmit
-                                        buttonText="Done"
-                                        onClick={() => handleOpenModal()}
-                                    />
+                                    <div>
+                                        <ButtonSubmit
+                                            buttonText="Done"
+                                            onClick={() => handleOpenModal()}
+                                        />
+                                        <ButtonSubmit
+                                            buttonText="Do report"
+                                            onClick={() => handleDoReport()}
+                                        />
+                                    </div>
                                 )}
 
                                 <Alert successful={successful} message={message}/>
