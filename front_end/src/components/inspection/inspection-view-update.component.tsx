@@ -22,6 +22,7 @@ type State = {
     redirect: string | null;
     userReady: boolean;
     currentUser: IUser & { access: string };
+    loading: boolean;
     message: string;
     successful: boolean;
     isModalOpen: boolean;
@@ -46,6 +47,7 @@ const InspectionView: React.FC<Props> = () => {
         redirect: null,
         userReady: false,
         currentUser: {access: ""},
+        loading: false,
         message: "",
         successful: false,
         isModalOpen: false,
@@ -160,6 +162,7 @@ const InspectionView: React.FC<Props> = () => {
             ...prevState,
             message: "",
             successful: false,
+            loading: true
         }));
 
         const inspectionId = state.id;
@@ -167,8 +170,9 @@ const InspectionView: React.FC<Props> = () => {
             .then(() => {
                 setState((prevState) => ({
                     ...prevState,
-                    message: "The data has been saved successfully!",
+                    message: "The report was created successfully!",
                     successful: true,
+                    loading: false
                 }));
             })
             .catch((error) => {
@@ -217,7 +221,7 @@ const InspectionView: React.FC<Props> = () => {
             });
     };
 
-    const {message, successful, currentUser} = state;
+    const {message, successful, currentUser, loading} = state;
 
     const initialValues = {
         id: state.id,
@@ -254,11 +258,6 @@ const InspectionView: React.FC<Props> = () => {
                             enableReinitialize
                         >
                             <Form>
-                                {(currentUser.role === "EMPLOYEE_OWNER") && (
-                                    <div className="text-center">
-                                    </div>
-                                )}
-
                                 <InputField label="Name" name="name" type="text" readOnly={true}/>
                                 <Textarea label="Reason" name="reason" readOnly={true}/>
                                 <InputField label="Facility" name="facility_name" type="text" readOnly={true}/>
@@ -303,15 +302,22 @@ const InspectionView: React.FC<Props> = () => {
 
                                 {(state.status === InspectionStatus.IN_PROCESS &&
                                     (state.currentUser.role === "EMPLOYEE_OWNER" || state.currentUser.role === "EMPLOYEE")) && (
-                                    <div>
-                                        <ButtonSubmit
-                                            buttonText="Done"
-                                            onClick={() => handleOpenModal()}
-                                        />
-                                        <ButtonSubmit
-                                            buttonText="Do report"
-                                            onClick={() => handleDoReport()}
-                                        />
+                                    <div className="col-md-12">
+                                        <div className="row">
+                                            <div className="col-md-6">
+                                                <ButtonSubmit
+                                                    loading={loading}
+                                                    buttonText="Do report"
+                                                    onClick={() => handleDoReport()}
+                                                />
+                                            </div>
+                                            <div className="col-md-6">
+                                                <ButtonSubmit
+                                                    buttonText="Done"
+                                                    onClick={() => handleOpenModal()}
+                                                />
+                                            </div>
+                                        </div>
                                     </div>
                                 )}
 

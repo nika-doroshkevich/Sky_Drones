@@ -1,5 +1,11 @@
+import tempfile
+
+import boto3
+from botocore.exceptions import ClientError
+
 from companies.models import Company
 from facilities.models import Facility
+from properties import ACCESS_KEY, SECRET_ACCESS_KEY, BUCKET_NAME, REGION_NAME, SIGNATURE_VERSION
 
 
 class UserRightsCorrespondingCheckMixin:
@@ -28,3 +34,57 @@ class UserRightsCorrespondingCheckMixin:
             for company in inspected_companies_queryset:
                 result_queryset = Facility.objects.filter(company_id=company.id)
         return result_queryset
+
+
+class AmazonS3Mixin:
+    @staticmethod
+    def upload_to_s3(file, unique_filename):
+        s3 = boto3.client('s3', aws_access_key_id=ACCESS_KEY, aws_secret_access_key=SECRET_ACCESS_KEY)
+        bucket_name = BUCKET_NAME
+        try:
+            s3.upload_fileobj(file, bucket_name, unique_filename)
+            url = f"https://{bucket_name}.s3.amazonaws.com/{unique_filename}"
+            return url
+        except Exception as e:
+            print("Error uploading image to S3:", e)
+            return None
+
+    @staticmethod
+    def download_file_from_s3(key):
+        try:
+            s3 = boto3.client('s3', aws_access_key_id=ACCESS_KEY, aws_secret_access_key=SECRET_ACCESS_KEY,
+                              region_name=REGION_NAME, config=boto3.session.Config(signature_version=SIGNATURE_VERSION))
+            response = s3.get_object(Bucket=BUCKET_NAME, Key=key)
+            file_data = response['Body'].read()
+
+            with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+                temp_file.write(file_data)
+
+            return temp_file.name
+
+        except ClientError as e:
+            print("Error downloading file from S3:", e)
+            return None
+
+    @staticmethod
+    def get_key_from_url(url):
+        parts = url.split("/")
+        url_after_fourth_part = "".join(parts[3:])
+
+        question_mark_index = url_after_fourth_part.rfind("?")
+
+        if question_mark_index != -1:
+            return url_after_fourth_part[:question_mark_index]
+        else:
+            return url_after_fourth_part
+
+    @staticmethod
+    def get_generated_presigned_url(key):
+        s3 = boto3.client('s3', aws_access_key_id=ACCESS_KEY, aws_secret_access_key=SECRET_ACCESS_KEY,
+                          region_name=REGION_NAME, config=boto3.session.Config(signature_version=SIGNATURE_VERSION))
+
+        return s3.generate_presigned_url(
+            'get_object',
+            Params={'Bucket': BUCKET_NAME, 'Key': key},
+            ExpiresIn=86400
+        )

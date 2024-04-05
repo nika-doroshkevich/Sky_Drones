@@ -1,10 +1,8 @@
-import tempfile
 import uuid
 from io import BytesIO
 from math import atan2, cos, sin
 
 import boto3
-from botocore.exceptions import ClientError
 from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -17,10 +15,11 @@ from facilities.models import Facility
 from file_storage_items.models import FileStorageItem
 from file_storage_items.serializers import FileStorageItemSerializer
 from properties import ACCESS_KEY, SECRET_ACCESS_KEY, BUCKET_NAME, REGION_NAME, SIGNATURE_VERSION
+from sky_drones.mixins import AmazonS3Mixin
 from sky_drones.utils import RoleEmployeeBasedPermission
 
 
-class UploadImages(APIView):
+class UploadImages(APIView, AmazonS3Mixin):
     permission_classes = (permissions.IsAuthenticated, RoleEmployeeBasedPermission,)
 
     def post(self, request, facility_id):
@@ -31,7 +30,7 @@ class UploadImages(APIView):
                 uploaded_files = []
                 for file in files:
                     unique_filename = str(uuid.uuid4())
-                    url = upload_to_s3(file, unique_filename)
+                    url = self.upload_to_s3(file, unique_filename)
                     if url:
                         file_instance = save_file_storage_item_to_db(unique_filename, url, facility_id)
                         uploaded_files.append(file_instance)
@@ -63,7 +62,7 @@ class ImagesList(APIView):
             return Response({'detail': 'No images found'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class ImageOverlay(APIView):
+class ImageOverlay(APIView, AmazonS3Mixin):
     permission_classes = (permissions.IsAuthenticated, RoleEmployeeBasedPermission,)
 
     def post(self, request):
@@ -73,12 +72,13 @@ class ImageOverlay(APIView):
             input_image = request.data.get('selected_image_url')
             elements = request.data.get('drawn_elements')
 
-            input_image_file = download_image_from_s3(input_image)
+            key = self.get_key_from_url(input_image)
+            input_image_file = self.download_file_from_s3(key)
             if input_image_file:
                 img_buffer = draw_elements_on_image(input_image_file, elements)
 
                 unique_filename = str(uuid.uuid4())
-                url_of_modified_image = upload_to_s3(img_buffer, unique_filename)
+                url_of_modified_image = self.upload_to_s3(img_buffer, unique_filename)
 
                 if url_of_modified_image:
                     save_file_storage_item_to_db(unique_filename, url_of_modified_image, facility_id)
@@ -86,8 +86,8 @@ class ImageOverlay(APIView):
                     return Response({'detail': 'Failed to upload image to S3'},
                                     status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-                key = get_key_from_url(url_of_modified_image)
-                image_url = get_generated_presigned_url(key)
+                key = self.get_key_from_url(url_of_modified_image)
+                image_url = self.get_generated_presigned_url(key)
 
                 return Response({'image_url': image_url}, status=status.HTTP_200_OK)
             else:
@@ -105,18 +105,6 @@ def check_users_ability_to_access_facility(user, facility_id):
         check = check or company.id == facility.company_id
 
     return check
-
-
-def upload_to_s3(file, unique_filename):
-    s3 = boto3.client('s3', aws_access_key_id=ACCESS_KEY, aws_secret_access_key=SECRET_ACCESS_KEY)
-    bucket_name = BUCKET_NAME
-    try:
-        s3.upload_fileobj(file, bucket_name, unique_filename)
-        url = f"https://{bucket_name}.s3.amazonaws.com/{unique_filename}"
-        return url
-    except Exception as e:
-        print("Error uploading image to S3:", e)
-        return None
 
 
 def get_images_urls_from_database(facility_id):
@@ -137,23 +125,24 @@ def get_images_urls_from_database(facility_id):
         return None
 
 
-def download_image_from_s3(image_url):
-    try:
-        key = get_key_from_url(image_url)
+def get_generated_presigned_url(key):
+    s3 = boto3.client('s3', aws_access_key_id=ACCESS_KEY, aws_secret_access_key=SECRET_ACCESS_KEY,
+                      region_name=REGION_NAME, config=boto3.session.Config(signature_version=SIGNATURE_VERSION))
 
-        s3 = boto3.client('s3', aws_access_key_id=ACCESS_KEY, aws_secret_access_key=SECRET_ACCESS_KEY,
-                          region_name=REGION_NAME, config=boto3.session.Config(signature_version=SIGNATURE_VERSION))
-        response = s3.get_object(Bucket=BUCKET_NAME, Key=key)
-        image_data = response['Body'].read()
+    return s3.generate_presigned_url(
+        'get_object',
+        Params={'Bucket': BUCKET_NAME, 'Key': key},
+        ExpiresIn=86400
+    )
 
-        with tempfile.NamedTemporaryFile(delete=False) as temp_image:
-            temp_image.write(image_data)
 
-        return temp_image.name
-
-    except ClientError as e:
-        print("Error downloading image from S3:", e)
-        return None
+def save_file_storage_item_to_db(unique_filename, url, facility_id):
+    facility = Facility.objects.get(pk=facility_id)
+    return FileStorageItem.objects.create(
+        file_name=unique_filename,
+        path=url,
+        facility=facility
+    )
 
 
 def draw_elements_on_image(image_path, elements):
@@ -226,35 +215,3 @@ def calculate_arrow_size(line_width):
         return line_width + 5 - (line_width - 1) * 0.5
     else:
         return line_width
-
-
-def get_key_from_url(url):
-    parts = url.split("/")
-    url_after_fourth_part = "".join(parts[3:])
-
-    question_mark_index = url_after_fourth_part.rfind("?")
-
-    if question_mark_index != -1:
-        return url_after_fourth_part[:question_mark_index]
-    else:
-        return url_after_fourth_part
-
-
-def get_generated_presigned_url(key):
-    s3 = boto3.client('s3', aws_access_key_id=ACCESS_KEY, aws_secret_access_key=SECRET_ACCESS_KEY,
-                      region_name=REGION_NAME, config=boto3.session.Config(signature_version=SIGNATURE_VERSION))
-
-    return s3.generate_presigned_url(
-        'get_object',
-        Params={'Bucket': BUCKET_NAME, 'Key': key},
-        ExpiresIn=86400
-    )
-
-
-def save_file_storage_item_to_db(unique_filename, url, facility_id):
-    facility = Facility.objects.get(pk=facility_id)
-    return FileStorageItem.objects.create(
-        file_name=unique_filename,
-        path=url,
-        facility=facility
-    )
