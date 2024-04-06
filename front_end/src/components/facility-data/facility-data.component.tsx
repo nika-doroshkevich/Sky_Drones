@@ -311,6 +311,7 @@ const FacilityData: React.FC = () => {
 
     const handleImagesSelected = (selectedImages: string[]) => {
         localStorage.setItem('selectedImagesForReport', JSON.stringify(selectedImages));
+        localStorage.setItem('facilityId', facilityId!);
     };
 
     return (

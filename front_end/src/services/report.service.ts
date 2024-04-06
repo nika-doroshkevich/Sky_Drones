@@ -11,6 +11,11 @@ class ReportService {
             inspectionId
         }, authConfig);
     }
+
+    async get(inspection_id: number) {
+        const authConfig = await authHeader();
+        return axios.get(API_URL + "report-url/" + inspection_id, authConfig);
+    }
 }
 
 export default new ReportService();

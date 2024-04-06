@@ -40,6 +40,7 @@ type State = {
     status: string;
 
     userList: IUser[];
+    reportUrl: string;
 };
 
 const InspectionView: React.FC<Props> = () => {
@@ -64,7 +65,8 @@ const InspectionView: React.FC<Props> = () => {
         inspector_username: "",
         status: "",
 
-        userList: []
+        userList: [],
+        reportUrl: ""
     });
 
     const params = useParams<{ id: string }>();
@@ -99,6 +101,18 @@ const InspectionView: React.FC<Props> = () => {
                     pilot_username: response.data.pilot_username,
                     inspector_username: response.data.inspector_username,
                     status: response.data.status,
+                }));
+            })
+            .catch((error) => {
+                handleError(error, setState);
+            });
+
+        ReportService.get(inspectionId)
+            .then((response) => {
+                const responseData: any = response.data;
+                setState((prevState) => ({
+                    ...prevState,
+                    reportUrl: responseData.data
                 }));
             })
             .catch((error) => {
@@ -221,7 +235,7 @@ const InspectionView: React.FC<Props> = () => {
             });
     };
 
-    const {message, successful, currentUser, loading} = state;
+    const {message, successful, loading, reportUrl} = state;
 
     const initialValues = {
         id: state.id,
@@ -258,6 +272,8 @@ const InspectionView: React.FC<Props> = () => {
                             enableReinitialize
                         >
                             <Form>
+                                <a href={reportUrl}>Download</a>
+
                                 <InputField label="Name" name="name" type="text" readOnly={true}/>
                                 <Textarea label="Reason" name="reason" readOnly={true}/>
                                 <InputField label="Facility" name="facility_name" type="text" readOnly={true}/>

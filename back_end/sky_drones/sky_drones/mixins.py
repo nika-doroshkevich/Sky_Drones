@@ -5,6 +5,7 @@ from botocore.exceptions import ClientError
 
 from companies.models import Company
 from facilities.models import Facility
+from inspections.models import Inspection
 from properties import ACCESS_KEY, SECRET_ACCESS_KEY, BUCKET_NAME, REGION_NAME, SIGNATURE_VERSION
 
 
@@ -34,6 +35,17 @@ class UserRightsCorrespondingCheckMixin:
             for company in inspected_companies_queryset:
                 result_queryset = Facility.objects.filter(company_id=company.id)
         return result_queryset
+
+    @staticmethod
+    def get_inspection_queryset(facility_queryset):
+        all_inspections_queryset = Inspection.objects.all()
+        result = Inspection.objects.none()
+        for inspection in all_inspections_queryset:
+            for facility in facility_queryset:
+                if inspection.facility_id == facility.id:
+                    result = result | Inspection.objects.filter(pk=inspection.pk)
+
+        return result
 
 
 class AmazonS3Mixin:

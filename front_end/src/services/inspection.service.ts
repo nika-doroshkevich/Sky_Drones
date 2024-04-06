@@ -40,6 +40,11 @@ class InspectionService {
         const authConfig = await authHeader();
         return axios.get(API_URL + "inspection-list", authConfig);
     }
+
+    async getListFilteredByFacilityAndStatus(facility_id: number) {
+        const authConfig = await authHeader();
+        return axios.get(API_URL + "inspection-list-for-defects/" + facility_id, authConfig);
+    }
 }
 
 export default new InspectionService();

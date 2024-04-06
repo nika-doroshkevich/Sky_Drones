@@ -5,6 +5,8 @@ from .views import InspectionAPIUpdate, InspectionAPIRetrieve
 
 urlpatterns = [
     path('inspection-list', views.InspectionAPIList.as_view(), name='inspection-list'),
+    path('inspection-list-for-defects/<int:facility_id>', views.InspectionAPIListForDefectsPage.as_view(),
+         name='inspection-list-for-defects'),
     path('inspection-create', views.InspectionAPICreate.as_view(), name='inspection-create'),
     path('inspection-update/<int:pk>', InspectionAPIUpdate.as_view(), name='inspection-update'),
     path('inspection/<int:pk>', InspectionAPIRetrieve.as_view(), name='inspection-retrieve'),

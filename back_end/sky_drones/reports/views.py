@@ -25,6 +25,22 @@ from sky_drones.utils import RoleEmployeeBasedPermission
 matplotlib.use('Agg')
 
 
+class ReportUrlAPIRetrieve(APIView, AmazonS3Mixin):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get(self, request, inspection_id):
+        try:
+            report = Report.objects.get(inspection_id=inspection_id)
+            file_storage_item = FileStorageItem.objects.get(id=report.file_storage_item_id)
+            presigned_report_url = self.get_generated_presigned_url(file_storage_item.file_name)
+        except Report.DoesNotExist:
+            presigned_report_url = None
+        except FileStorageItem.DoesNotExist:
+            presigned_report_url = None
+
+        return Response({'data': presigned_report_url}, status=status.HTTP_200_OK)
+
+
 class ReportAPICreate(APIView, AmazonS3Mixin):
     permission_classes = (permissions.IsAuthenticated, RoleEmployeeBasedPermission,)
 

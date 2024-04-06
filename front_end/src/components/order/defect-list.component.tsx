@@ -65,10 +65,11 @@ const DefectList: React.FC<Props> = () => {
         }
 
         const selectedImages = JSON.parse(localStorage.getItem('selectedImagesForReport') || '[]');
+        const facilityId = parseInt(localStorage.getItem('facilityId') || '');
         setImagesUrls(selectedImages);
         setDefectsNumber(selectedImages.length);
 
-        InspectionService.getList()
+        InspectionService.getListFilteredByFacilityAndStatus(facilityId)
             .then((response) => {
                 setState((prevState) => ({
                     ...prevState,
@@ -79,7 +80,7 @@ const DefectList: React.FC<Props> = () => {
                 handleError(error, setState);
             });
 
-    }, []);
+    }, [defectsNumber]);
 
     const validationSchema = () => {
         return Yup.object().shape({
@@ -164,16 +165,20 @@ const DefectList: React.FC<Props> = () => {
                             onSubmit={handleSubmit}
                         >
                             <Form>
-                                <SelectField
-                                    label="Inspection"
-                                    name="inspection"
-                                    options={state.inspections.map(inspection => ({
-                                        value: inspection.id,
-                                        label: inspection.name!
-                                    }))}
-                                />
-                                {generateFields()}
-                                <ButtonSubmit buttonText="Next"/>
+                                {(defectsNumber !== 0) && (
+                                    <div>
+                                        <SelectField
+                                            label="Inspection"
+                                            name="inspection"
+                                            options={state.inspections.map(inspection => ({
+                                                value: inspection.id,
+                                                label: inspection.name!
+                                            }))}
+                                        />
+                                        {generateFields()}
+                                        <ButtonSubmit buttonText="Next"/>
+                                    </div>
+                                )}
                                 <Alert successful={successful} message={message}/>
                             </Form>
                         </Formik>
