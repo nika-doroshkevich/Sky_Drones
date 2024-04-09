@@ -1,0 +1,22 @@
+:root {
+    --header-height: 55px;
+}
+
+.container-fullscreen {
+    width: 100%;
+    height: calc(100vh - var(--header-height));
+    background-image: url('background.jpg');
+    background-size: cover;
+    background-position: center;
+}
+
+.text-custom-header {
+    font-size: 40px;
+    padding-left: 300px;
+    padding-top: 50px;
+}
+
+.text-custom {
+    font-size: 30px;
+    padding-left: 300px;
+}

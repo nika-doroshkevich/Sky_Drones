@@ -170,7 +170,8 @@ export default class FacilityCreate extends Component<Props, State> {
         };
 
         return (
-            <div className="col-md-12">
+
+            <div className="col-md-11 mt-3 mx-auto">
                 {(this.state.userReady) ?
                     <div className="row">
                         <div className="col-md-6">
@@ -214,6 +215,7 @@ export default class FacilityCreate extends Component<Props, State> {
                         </div>
                     </div> : null}
             </div>
+
         );
     }
 }

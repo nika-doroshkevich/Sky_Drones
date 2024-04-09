@@ -76,8 +76,3 @@ class UserAPIUpdate(generics.UpdateAPIView):
         self.perform_update(serializer)
 
         return Response(serializer.data)
-
-
-class AllView(APIView):
-    def get(self, request):
-        return Response({'data': "Hello"}, status=status.HTTP_200_OK)

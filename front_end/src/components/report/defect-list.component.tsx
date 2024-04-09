@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from "react";
 import {Navigate} from "react-router-dom";
-import './defect-list.css';
 import IUser from "../../types/user.type";
 import AuthService from "../../services/login-register/auth.service";
 import {Form, Formik} from "formik";
@@ -131,7 +130,7 @@ const DefectList: React.FC<Props> = () => {
         const fields = [];
         for (let index = 0; index < defectsNumber; index++) {
             fields.push(
-                <div key={index}>
+                <div key={index} className="mt-3 mb-5">
                     <h5>Defect #{index + 1}</h5>
                     <img className="image" src={imagesUrls[index]} alt={`Defect ${index + 1}`}/>
                     <InputField label="Name" name={`defects[${index}].name`} type="text"/>
@@ -150,10 +149,10 @@ const DefectList: React.FC<Props> = () => {
     }
 
     return (
-        <div className="col-md-12">
+        <div className="container mt-4 col-md-12">
             {(state.userReady) ?
                 <div className="row">
-                    <div className="col-md-8 mx-auto main">
+                    <div className="col-md-8 mx-auto mb-4">
                         <h3 className="text-center">Description of defects</h3>
                         <Formik
                             initialValues={{

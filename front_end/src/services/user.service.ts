@@ -32,10 +32,6 @@ class UserService {
         }, authConfig);
     }
 
-    getPublicContent() {
-        return axios.get(API_URL + "all");
-    }
-
     async getUser() {
         return axios.get(API_URL + "user", await authHeader());
     }

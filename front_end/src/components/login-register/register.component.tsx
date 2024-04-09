@@ -1,6 +1,7 @@
 import {Component} from "react";
 import {Form, Formik} from "formik";
 import * as Yup from "yup";
+import "./login-register.css";
 
 import AuthService from "../../services/login-register/auth.service";
 import InputField from "../../common/InputField";
@@ -113,14 +114,8 @@ export default class Register extends Component<Props, State> {
         ];
 
         return (
-            <div className="col-md-12">
+            <div className="col-md-12 main">
                 <div className="card card-container">
-                    <img
-                        src="//ssl.gstatic.com/accounts/ui/avatar_2x.png"
-                        alt="profile-img"
-                        className="profile-img-card"
-                    />
-
                     <Formik
                         initialValues={initialValues}
                         validationSchema={this.validationSchema}

@@ -173,32 +173,31 @@ export default class Profile extends Component<Props, State> {
         };
 
         return (
-            <div className="col-md-12">
-                <div className="card card-container">
-                    {(this.state.userReady) ?
-                        <div>
-                            <Formik
-                                initialValues={initialValues}
-                                validationSchema={this.validationSchema}
-                                onSubmit={this.handleUpdate}
-                                enableReinitialize
-                            >
-                                <Form>
+            <div className="col-md-12 mt-3">
+                {(this.state.userReady) ?
+                    <div className="col-md-4 mx-auto">
+                        <Formik
+                            initialValues={initialValues}
+                            validationSchema={this.validationSchema}
+                            onSubmit={this.handleUpdate}
+                            enableReinitialize
+                        >
+                            <Form>
 
-                                    <SelectField label="Title" name="title" options={titleOptions}/>
-                                    <InputField label="Username" name="username" type="text"/>
-                                    <InputField label="Email" name="email" type="text" disabled/>
-                                    <InputField label="Phone" name="phone" type="text"/>
-                                    <InputField label="Job title" name="jobTitle" type="text"/>
-                                    <InputField label="Role" name="role" type="text" disabled/>
+                                <SelectField label="Title" name="title" options={titleOptions}/>
+                                <InputField label="Username" name="username" type="text"/>
+                                <InputField label="Email" name="email" type="text" disabled/>
+                                <InputField label="Phone" name="phone" type="text"/>
+                                <InputField label="Job title" name="jobTitle" type="text"/>
+                                <InputField label="Role" name="role" type="text" disabled/>
 
-                                    <ButtonSubmit loading={loading} buttonText="Update"/>
-                                    <Alert successful={successful} message={message}/>
+                                <ButtonSubmit loading={loading} buttonText="Update"/>
+                                <Alert successful={successful} message={message}/>
 
-                                </Form>
-                            </Formik>
-                        </div> : null}
-                </div>
+                            </Form>
+                        </Formik>
+                    </div>
+                    : null}
             </div>
         );
     }

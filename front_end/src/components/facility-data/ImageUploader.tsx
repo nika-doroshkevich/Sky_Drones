@@ -61,8 +61,8 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({facilityId, onImagesUpload
             <div className="input_wrapper">
                 <input name="file" type="file" id="input_file" className="input input_file" onChange={handleFileChange}
                        multiple/>
-                <label htmlFor="input_file" className="input_file-button">
-                    <span className="input_file-button-text">Upload images</span>
+                <label htmlFor="input_file" className="btn btn-secondary">
+                    <span>Upload images</span>
                 </label>
             </div>
         </div>

@@ -110,7 +110,7 @@ const FacilityView: React.FC<Props> = () => {
     }
 
     return (
-        <div className="col-md-12">
+        <div className="col-md-11 mt-3 mx-auto">
             {state.userReady ? (
                 <div className="row">
                     <div className="col-md-6">
@@ -134,7 +134,7 @@ const FacilityView: React.FC<Props> = () => {
                                 {(currentUser.role === "EMPLOYEE_OWNER" || currentUser.role === "EMPLOYEE") && (
                                     <div className="text-center">
                                         <Link to={`/facility-data/${facilityId}`}
-                                              className="btn btn-secondary btn-block">
+                                              className="btn btn-primary btn-block">
                                             <span>Add data</span>
                                         </Link>
                                     </div>

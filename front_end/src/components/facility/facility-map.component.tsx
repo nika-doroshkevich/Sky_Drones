@@ -85,7 +85,7 @@ const FacilityMap: React.FC<Props> = () => {
     }
 
     return (
-        <div className="col-md-12">
+        <div className="col-md-12 mt-4">
             {state.userReady ? (
                 <div className="container">
                     <MapContainer center={[53.9, 27.5667]} zoom={10} style={{height: '450px'}}>

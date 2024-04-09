@@ -68,7 +68,7 @@ const InspectionList: React.FC<Props> = () => {
     }
 
     return (
-        <div className="container">
+        <div className="container mt-4">
             {(state.userReady) ?
                 <header className="jumbotron">
                     <h3>Our inspections</h3>

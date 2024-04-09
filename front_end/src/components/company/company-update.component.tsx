@@ -182,40 +182,38 @@ export default class CompanyUpdate extends Component<Props, State> {
         };
 
         return (
-            <div className="col-md-12">
-                <div className="card card-container">
-                    {(this.state.userReady) ?
-                        <div>
-                            <Formik
-                                initialValues={initialValues}
-                                validationSchema={this.validationSchema}
-                                onSubmit={this.handleUpdate}
-                                enableReinitialize
-                            >
-                                <Form>
+            <div className="col-md-12 mt-4">
+                {(this.state.userReady) ?
+                    <div className="col-md-4 mx-auto">
+                        <Formik
+                            initialValues={initialValues}
+                            validationSchema={this.validationSchema}
+                            onSubmit={this.handleUpdate}
+                            enableReinitialize
+                        >
+                            <Form>
 
-                                    <InputField label="Name" name="name" type="text"/>
-                                    <InputField label="Phone" name="phone" type="text"/>
-                                    <InputField label="Website" name="website" type="text"/>
-                                    <InputField label="Company type" name="companyType" type="text" disabled/>
-                                    <InputField label="Inspecting company" name="inspectingCompanyName" type="text"
-                                                disabled/>
+                                <InputField label="Name" name="name" type="text"/>
+                                <InputField label="Phone" name="phone" type="text"/>
+                                <InputField label="Website" name="website" type="text"/>
+                                <InputField label="Company type" name="companyType" type="text" disabled/>
+                                <InputField label="Inspecting company" name="inspectingCompanyName" type="text"
+                                            disabled/>
 
-                                    <div className="form-group text-center mt-3">
-                                        <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
-                                            {loading && (
-                                                <span className="spinner-border spinner-border-sm"></span>
-                                            )}
-                                            <span>Update</span>
-                                        </button>
-                                    </div>
+                                <div className="form-group text-center mt-3">
+                                    <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
+                                        {loading && (
+                                            <span className="spinner-border spinner-border-sm"></span>
+                                        )}
+                                        <span>Update</span>
+                                    </button>
+                                </div>
 
-                                    <Alert successful={successful} message={message}/>
+                                <Alert successful={successful} message={message}/>
 
-                                </Form>
-                            </Formik>
-                        </div> : null}
-                </div>
+                            </Form>
+                        </Formik>
+                    </div> : null}
             </div>
         );
     }

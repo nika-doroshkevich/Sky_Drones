@@ -154,66 +154,64 @@ export default class Company extends Component<Props, State> {
         };
 
         return (
-            <div className="col-md-12">
-                <div className="card card-container">
-                    {(this.state.userReady) ?
-                        <div>
-                            <Formik
-                                initialValues={initialValues}
-                                validationSchema={this.validationSchema}
-                                onSubmit={this.handleCreate}
-                                enableReinitialize
-                            >
-                                <Form>
+            <div className="col-md-12 mt-4">
+                {(this.state.userReady) ?
+                    <div className="col-md-4 mx-auto">
+                        <Formik
+                            initialValues={initialValues}
+                            validationSchema={this.validationSchema}
+                            onSubmit={this.handleCreate}
+                            enableReinitialize
+                        >
+                            <Form>
 
-                                    <InputField label="Name" name="name" type="text"/>
-                                    <InputField label="Phone" name="phone" type="text"/>
-                                    <InputField label="Website" name="website" type="text"/>
+                                <InputField label="Name" name="name" type="text"/>
+                                <InputField label="Phone" name="phone" type="text"/>
+                                <InputField label="Website" name="website" type="text"/>
 
-                                    <div className="form-group">
-                                        <label htmlFor="companyType">Company type</label>
-                                        <Field
-                                            name="companyType"
-                                            as="select"
-                                            className="form-control"
-                                        >
-                                            <option value="" disabled>Select a company type</option>
-                                            <option value="INSPECTING">INSPECTING</option>
-                                            <option value="INSPECTED">INSPECTED</option>
-                                        </Field>
-                                        <ErrorMessage
-                                            name="companyType"
-                                            component="div"
-                                            className="alert alert-danger"
-                                        />
-                                    </div>
+                                <div className="form-group">
+                                    <label htmlFor="companyType">Company type</label>
+                                    <Field
+                                        name="companyType"
+                                        as="select"
+                                        className="form-control"
+                                    >
+                                        <option value="" disabled>Select a company type</option>
+                                        <option value="INSPECTING">INSPECTING</option>
+                                        <option value="INSPECTED">INSPECTED</option>
+                                    </Field>
+                                    <ErrorMessage
+                                        name="companyType"
+                                        component="div"
+                                        className="alert alert-danger"
+                                    />
+                                </div>
 
-                                    <div className="form-group">
-                                        <label htmlFor="inspectingCompany">Inspecting company</label>
-                                        <Field
-                                            name="inspectingCompany"
-                                            as="select"
-                                            className="form-control"
-                                        >
-                                            <option value="" disabled>Select an inspecting company</option>
-                                            {this.state.inspectingCompanies.map(company => (
-                                                <option key={company.id} value={company.id}>{company.name}</option>
-                                            ))}
-                                        </Field>
-                                        <ErrorMessage
-                                            name="inspectingCompany"
-                                            component="div"
-                                            className="alert alert-danger"
-                                        />
-                                    </div>
+                                <div className="form-group">
+                                    <label htmlFor="inspectingCompany">Inspecting company</label>
+                                    <Field
+                                        name="inspectingCompany"
+                                        as="select"
+                                        className="form-control"
+                                    >
+                                        <option value="" disabled>Select an inspecting company</option>
+                                        {this.state.inspectingCompanies.map(company => (
+                                            <option key={company.id} value={company.id}>{company.name}</option>
+                                        ))}
+                                    </Field>
+                                    <ErrorMessage
+                                        name="inspectingCompany"
+                                        component="div"
+                                        className="alert alert-danger"
+                                    />
+                                </div>
 
-                                    <ButtonSubmit loading={loading} buttonText={"Create"}/>
-                                    <Alert successful={successful} message={message}/>
+                                <ButtonSubmit loading={loading} buttonText={"Create"}/>
+                                <Alert successful={successful} message={message}/>
 
-                                </Form>
-                            </Formik>
-                        </div> : null}
-                </div>
+                            </Form>
+                        </Formik>
+                    </div> : null}
             </div>
         );
     }

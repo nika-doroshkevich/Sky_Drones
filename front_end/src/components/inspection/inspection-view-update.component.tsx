@@ -255,7 +255,7 @@ const InspectionView: React.FC<Props> = () => {
     }
 
     return (
-        <div className="col-md-12">
+        <div className="container mt-4 col-md-12">
             <Modal
                 isOpen={state.isModalOpen}
                 onClose={() => handleCloseModal()}
@@ -272,7 +272,11 @@ const InspectionView: React.FC<Props> = () => {
                             enableReinitialize
                         >
                             <Form>
-                                <a href={reportUrl}>Download</a>
+                                {(reportUrl !== null) && (
+                                    <div className="text-center">
+                                        <a className="btn btn-secondary" href={reportUrl}>Download</a>
+                                    </div>
+                                )}
 
                                 <InputField label="Name" name="name" type="text" readOnly={true}/>
                                 <Textarea label="Reason" name="reason" readOnly={true}/>

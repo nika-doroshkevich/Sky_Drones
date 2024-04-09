@@ -38,6 +38,7 @@ const FacilityData: React.FC = () => {
     const [lineEndPos, setLineEndPos] = useState({x: 0, y: 0});
     const [drawnElements, setDrawnElements] = useState<any[]>([]);
     const [selectedImageUrl, setSelectedImageUrl] = useState<string>("");
+    const [activeButton, setActiveButton] = useState(0);
     const [state, setState] = useState<State>({
         message: "",
         successful: false
@@ -259,8 +260,9 @@ const FacilityData: React.FC = () => {
         setCurrentColor(event.target.value);
     };
 
-    const handleToolChange = (tool: string) => {
+    const handleToolChange = (tool: string, buttonId: number) => {
         setTool(tool);
+        setActiveButton(buttonId);
     };
 
     const handleDrop = (event: React.DragEvent<HTMLCanvasElement>) => {
@@ -315,7 +317,7 @@ const FacilityData: React.FC = () => {
     };
 
     return (
-        <div>
+        <div className="container mt-3">
             <Carousel images={uploadedImages} onImagesSelected={handleImagesSelected}/>
             <div className="mainContainer">
                 <div className="tools">
@@ -325,16 +327,24 @@ const FacilityData: React.FC = () => {
                     </div>
 
                     <div>
-                        <button onClick={() => handleToolChange("line")} className="tool-button">
+                        <button onClick={() => handleToolChange("line", 1)}
+                                style={{borderColor: activeButton === 1 ? '#aac4e6' : 'black'}}
+                                className="tool-button">
                             <img src={line} alt="line" className="icon"/>
                         </button>
-                        <button onClick={() => handleToolChange("circle")} className="tool-button">
+                        <button onClick={() => handleToolChange("circle", 2)}
+                                style={{borderColor: activeButton === 2 ? '#aac4e6' : 'black'}}
+                                className="tool-button">
                             <img src={circle} alt="circle" className="icon"/>
                         </button>
-                        <button onClick={() => handleToolChange("square")} className="tool-button">
+                        <button onClick={() => handleToolChange("square", 3)}
+                                style={{borderColor: activeButton === 3 ? '#aac4e6' : 'black'}}
+                                className="tool-button">
                             <img src={square} alt="square" className="icon"/>
                         </button>
-                        <button onClick={() => handleToolChange("arrow")} className="tool-button">
+                        <button onClick={() => handleToolChange("arrow", 4)}
+                                style={{borderColor: activeButton === 4 ? '#aac4e6' : 'black'}}
+                                className="tool-button">
                             <img src={arrow} alt="arrow" className="icon"/>
                         </button>
                     </div>
@@ -348,19 +358,19 @@ const FacilityData: React.FC = () => {
                     </div>
 
                     <div className="width">
-                        <p>Width:</p>
-                        <p>{lineWidth}</p>
+                        <span>Width:</span>
+                        <span>{lineWidth}</span>
                     </div>
                     <input type="range" min="1" max="20" value={lineWidth} onChange={handleChangeLineWidth}/>
 
                     <div>
-                        <button className="button save-button"
+                        <button className="btn btn-secondary button"
                                 onClick={() => saveCanvasImage(facilityId ? parseInt(facilityId) : 0)}>Save image
                         </button>
                     </div>
 
                     <Link to={'/defect-list'}
-                          className="btn button report-button">
+                          className="btn btn-primary button">
                         <span>Analysis</span>
                     </Link>
 

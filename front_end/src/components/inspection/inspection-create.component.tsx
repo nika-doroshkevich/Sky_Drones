@@ -133,7 +133,7 @@ const InspectionCreate: React.FC<Props> = () => {
     }
 
     return (
-        <div className="col-md-12">
+        <div className="container mt-4 col-md-12">
             {state.userReady ? (
                 <div className="row">
                     <div className="col-md-6 mx-auto">

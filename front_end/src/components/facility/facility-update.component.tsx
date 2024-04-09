@@ -166,49 +166,51 @@ const FacilityUpdate: React.FC<Props> = () => {
     }
 
     return (
-        <div className="col-md-12">
-            {state.userReady ? (
-                <div className="row">
-                    <div className="col-md-6">
-                        <MapComponent
-                            latitude={latitude}
-                            longitude={longitude}
-                            onMarkerPositionChange={handleMarkerPositionChange}
-                            isMarker={true}
-                            zoomValue={15}
-                        />
-                    </div>
-                    <div className="col-md-6">
-                        <Formik
-                            initialValues={initialValues}
-                            validationSchema={validationSchema}
-                            onSubmit={handleUpdate}
-                            enableReinitialize
-                        >
-                            <Form>
-                                <div className="col-md-12">
-                                    <div className="row">
-                                        <div className="col-md-6">
-                                            <InputField label="Latitude" name="latitude" type="text"/>
-                                        </div>
-                                        <div className="col-md-6">
-                                            <InputField label="Longitude" name="longitude" type="text"/>
+        <div>
+            <div className="col-md-11 mt-3 mx-auto">
+                {state.userReady ? (
+                    <div className="row">
+                        <div className="col-md-6">
+                            <MapComponent
+                                latitude={latitude}
+                                longitude={longitude}
+                                onMarkerPositionChange={handleMarkerPositionChange}
+                                isMarker={true}
+                                zoomValue={15}
+                            />
+                        </div>
+                        <div className="col-md-6">
+                            <Formik
+                                initialValues={initialValues}
+                                validationSchema={validationSchema}
+                                onSubmit={handleUpdate}
+                                enableReinitialize
+                            >
+                                <Form>
+                                    <div className="col-md-12">
+                                        <div className="row">
+                                            <div className="col-md-6">
+                                                <InputField label="Latitude" name="latitude" type="text"/>
+                                            </div>
+                                            <div className="col-md-6">
+                                                <InputField label="Longitude" name="longitude" type="text"/>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <InputField label="Name" name="name" type="text"/>
-                                <SelectField label="Facility type" name="type" options={facilityTypeOptions}/>
-                                <InputField label="Location" name="location" type="text"/>
-                                <Textarea label="Description" name="description"/>
+                                    <InputField label="Name" name="name" type="text"/>
+                                    <SelectField label="Facility type" name="type" options={facilityTypeOptions}/>
+                                    <InputField label="Location" name="location" type="text"/>
+                                    <Textarea label="Description" name="description"/>
 
-                                <ButtonSubmit loading={loading} buttonText="Update"/>
-                                <Alert successful={successful} message={message}/>
-                            </Form>
-                        </Formik>
+                                    <ButtonSubmit loading={loading} buttonText="Update"/>
+                                    <Alert successful={successful} message={message}/>
+                                </Form>
+                            </Formik>
+                        </div>
                     </div>
-                </div>
-            ) : null}
+                ) : null}
+            </div>
         </div>
     );
 };

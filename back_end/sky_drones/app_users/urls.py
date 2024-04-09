@@ -11,5 +11,4 @@ urlpatterns = [
     path('users', views.UserList.as_view(), name='users'),
     path('user/<int:pk>', UserAPIUpdate.as_view(), name='user-update'),
     path('join-company/<int:pk>', UserAPIUpdate.as_view(), name='join-company'),
-    path('all', views.AllView.as_view(), name='all'),
 ]

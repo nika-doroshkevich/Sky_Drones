@@ -75,7 +75,7 @@ export default class FacilityList extends Component<Props, State> {
         const {message, successful, currentUser} = this.state;
 
         return (
-            <div className="container">
+            <div className="container mt-4">
                 {(this.state.userReady) ?
                     <header className="jumbotron">
                         <h3>Our facilities</h3>

@@ -30,3 +30,20 @@ label {
     -webkit-border-radius: 50%;
     border-radius: 50%;
 }
+
+#offcanvasExample {
+    width: 230px;
+}
+
+.offcanvasItem {
+    margin-bottom: 15px;
+}
+
+.navbar-custom {
+    height: 55px;
+    background-color: #2c4059
+}
+
+.offcanvas-custom {
+    background-color: #2c4059
+}

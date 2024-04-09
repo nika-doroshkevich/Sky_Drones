@@ -38,19 +38,5 @@
 }
 
 .button {
-    padding: 10px 20px;
-    border: white;
-    border-radius: 5px;
-    cursor: pointer;
     margin-top: 25px;
-}
-
-.save-button {
-    background: #ccc;
-    color: #333;
-}
-
-.report-button {
-    background: #6c757d;
-    color: white;
 }

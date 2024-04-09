@@ -113,7 +113,7 @@ export default class BoardOwner extends Component<Props, State> {
         const {loading, message, successful} = this.state;
 
         return (
-            <div className="container">
+            <div className="container mt-4">
                 <Modal
                     isOpen={this.state.isModalOpen}
                     onClose={() => this.handleCloseModal()}
