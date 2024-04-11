@@ -14,6 +14,19 @@ class DefectService {
             inspectionId
         }, authConfig);
     }
+
+    async delete(id: number) {
+        const deleted = true;
+        const authConfig = await authHeader();
+        return axios.put(API_URL + "delete-defect/" + id, {
+            deleted
+        }, authConfig);
+    }
+
+    async getList(inspection_id: number) {
+        const authConfig = await authHeader();
+        return axios.get(API_URL + "defects-list/" + inspection_id, authConfig);
+    }
 }
 
 export default new DefectService();

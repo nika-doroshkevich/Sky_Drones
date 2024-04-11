@@ -5,9 +5,10 @@ type SelectFieldProps = {
     label: string;
     name: string;
     options: { value: string | number, label: string }[];
+    disabled?: boolean;
 };
 
-const SelectField: React.FC<SelectFieldProps> = ({label, name, options}) => {
+const SelectField: React.FC<SelectFieldProps> = ({label, name, options, disabled}) => {
     return (
         <div className="form-group">
             <label htmlFor={name}>{label}</label>
@@ -15,6 +16,7 @@ const SelectField: React.FC<SelectFieldProps> = ({label, name, options}) => {
                 name={name}
                 as="select"
                 className="form-control"
+                disabled={disabled}
             >
                 <option value="" disabled>Select {label.toLowerCase()}</option>
                 {options.map((option) => (

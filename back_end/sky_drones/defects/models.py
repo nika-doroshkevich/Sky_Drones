@@ -11,6 +11,7 @@ class Defect(models.Model):
     description = models.TextField()
     file_storage_item = models.ForeignKey(FileStorageItem, on_delete=models.PROTECT)
     inspection = models.ForeignKey(Inspection, on_delete=models.PROTECT)
+    deleted = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name

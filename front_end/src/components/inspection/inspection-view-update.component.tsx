@@ -9,12 +9,14 @@ import Alert from "../../common/Alert";
 import handleError from "../../common/ErrorHandler";
 import InspectionService from "../../services/inspection.service";
 import UserService from "../../services/user.service";
-import {inspectionPriorityOptions, InspectionStatus} from "../../common/Constants";
+import {defectSeverityOptions, inspectionPriorityOptions, InspectionStatus} from "../../common/Constants";
 import SelectField from "../../common/SelectField";
 import * as Yup from "yup";
 import ButtonSubmit from "../../common/ButtonSubmit";
 import Modal from "../../common/Modal";
 import ReportService from "../../services/report.service";
+import IDefectModel from "../../types/defect-model.type";
+import DefectService from "../../services/defect.service";
 
 type Props = {};
 
@@ -25,7 +27,8 @@ type State = {
     loading: boolean;
     message: string;
     successful: boolean;
-    isModalOpen: boolean;
+    isInspectionFinishModalOpen: boolean;
+    isDeleteDefectModalOpen: boolean;
 
     id: any;
     name: string;
@@ -41,6 +44,9 @@ type State = {
 
     userList: IUser[];
     reportUrl: string;
+
+    defects: IDefectModel[];
+    defectIdToDelete: any;
 };
 
 const InspectionView: React.FC<Props> = () => {
@@ -51,7 +57,8 @@ const InspectionView: React.FC<Props> = () => {
         loading: false,
         message: "",
         successful: false,
-        isModalOpen: false,
+        isInspectionFinishModalOpen: false,
+        isDeleteDefectModalOpen: false,
 
         id: null,
         name: "",
@@ -66,7 +73,10 @@ const InspectionView: React.FC<Props> = () => {
         status: "",
 
         userList: [],
-        reportUrl: ""
+        reportUrl: "",
+
+        defects: [],
+        defectIdToDelete: null
     });
 
     const params = useParams<{ id: string }>();
@@ -132,7 +142,21 @@ const InspectionView: React.FC<Props> = () => {
                 });
         }
 
-    }, [inspectionId, state.currentUser.role, state.status]);
+        if (state.status === InspectionStatus.IN_PROCESS &&
+            (currentUser.role === "EMPLOYEE_OWNER" || currentUser.role === "EMPLOYEE")) {
+            DefectService.getList(state.id)
+                .then((response) => {
+                    setState((prevState) => ({
+                        ...prevState,
+                        defects: response.data
+                    }));
+                })
+                .catch((error) => {
+                    handleError(error, setState);
+                });
+        }
+
+    }, [inspectionId, state.currentUser.role, state.defects.length, state.id, state.status]);
 
     const validationSchema = () => {
         return Yup.object().shape({
@@ -142,7 +166,7 @@ const InspectionView: React.FC<Props> = () => {
         });
     };
 
-    const handleUpdate = (formValue: {
+    const handleUpdateInspection = (formValue: {
         id: any;
         priority: string;
         pilot: any;
@@ -194,18 +218,34 @@ const InspectionView: React.FC<Props> = () => {
             });
     };
 
-    const handleOpenModal = () => {
+    const handleInspectionFinishOpenModal = () => {
         setState((prevState) => ({
             ...prevState,
-            isModalOpen: true
+            isInspectionFinishModalOpen: true
         }));
     }
 
-    const handleCloseModal = () => {
+    const handleDeleteDefectOpenModal = (defectId: any) => {
         setState((prevState) => ({
             ...prevState,
-            isModalOpen: false
+            isDeleteDefectModalOpen: true,
+            defectIdToDelete: defectId
         }));
+    }
+
+    const handleCloseModal = (modal: string) => {
+        if (modal === "inspectionFinish") {
+            setState((prevState) => ({
+                ...prevState,
+                isInspectionFinishModalOpen: false
+            }));
+        }
+        if (modal === "deleteDefect") {
+            setState((prevState) => ({
+                ...prevState,
+                isDeleteDefectModalOpen: false
+            }));
+        }
     }
 
     const handleConfirmUpdateStatus = () => {
@@ -215,7 +255,7 @@ const InspectionView: React.FC<Props> = () => {
             ...prevState,
             message: "",
             successful: false,
-            isModalOpen: false,
+            isInspectionFinishModalOpen: false,
             companyIdToJoin: 0
         }));
 
@@ -235,6 +275,54 @@ const InspectionView: React.FC<Props> = () => {
             });
     };
 
+    const handleConfirmDeleteDefect = () => {
+        setState((prevState) => ({
+            ...prevState,
+            message: "",
+            successful: false,
+            isDeleteDefectModalOpen: false
+        }));
+
+        const defectId = state.defectIdToDelete;
+
+        DefectService.delete(defectId)
+            .then(() => {
+                setState((prevState) => ({
+                    ...prevState,
+                    message: "The defect has been successfully deleted.",
+                    successful: true
+                }));
+            })
+            .catch((error) => {
+                handleError(error, setState);
+            });
+    };
+
+    const generateFields = () => {
+        return state.defects.map((defect, index) => (
+            <div key={index} className="mt-3 mb-5">
+
+                <div className="col-md-12">
+                    <div className="row">
+                        <div className="col-md-11">
+                            <h5>Defect #{index + 1}</h5>
+                        </div>
+                        <div className="col-md-1">
+                            <button type="submit" className="btn-close btn-close-black"
+                                    aria-label="Close" onClick={() => handleDeleteDefectOpenModal(defect.id)}></button>
+                        </div>
+                    </div>
+                </div>
+
+                <img className="image" src={state.defects[index].file_storage_item_path!} alt={`Defect ${index + 1}`}/>
+                <InputField label="Name" name={`defects[${index}].name`} type="text" readOnly={true}/>
+                <SelectField label="Severity" name={`defects[${index}].severity`}
+                             options={defectSeverityOptions} disabled={true}/>
+                <Textarea label="Description" name={`defects[${index}].description`} readOnly={true}/>
+            </div>
+        ));
+    };
+
     const {message, successful, loading, reportUrl} = state;
 
     const initialValues = {
@@ -247,7 +335,9 @@ const InspectionView: React.FC<Props> = () => {
         pilot_username: state.pilot_username || "",
         inspector: "",
         inspector_username: state.inspector_username || "",
-        status: state.status
+        status: state.status,
+
+        defects: state.defects || []
     };
 
     if (state.redirect) {
@@ -257,24 +347,30 @@ const InspectionView: React.FC<Props> = () => {
     return (
         <div className="container mt-4 col-md-12">
             <Modal
-                isOpen={state.isModalOpen}
-                onClose={() => handleCloseModal()}
+                isOpen={state.isInspectionFinishModalOpen}
+                onClose={() => handleCloseModal("inspectionFinish")}
                 onConfirm={() => handleConfirmUpdateStatus()}
                 message="Are you sure you want to finish this inspection?"
             />
+            <Modal
+                isOpen={state.isDeleteDefectModalOpen}
+                onClose={() => handleCloseModal("deleteDefect")}
+                onConfirm={() => handleConfirmDeleteDefect()}
+                message="Are you sure you want to delete this defect?"
+            />
             {state.userReady ? (
                 <div className="row">
-                    <div className="col-md-6 mx-auto" style={{marginBottom: "20px"}}>
-                        <Formik
-                            initialValues={initialValues}
-                            validationSchema={validationSchema}
-                            onSubmit={handleUpdate}
-                            enableReinitialize
-                        >
-                            <Form>
+                    <Formik
+                        initialValues={initialValues}
+                        validationSchema={validationSchema}
+                        onSubmit={handleUpdateInspection}
+                        enableReinitialize
+                    >
+                        <Form>
+                            <div className="col-md-6 mb-4 mx-auto">
                                 {(reportUrl !== null) && (
                                     <div className="text-center">
-                                        <a className="btn btn-secondary" href={reportUrl}>Download</a>
+                                        <a className="btn btn-secondary" href={reportUrl}>Download the report</a>
                                     </div>
                                 )}
 
@@ -325,16 +421,24 @@ const InspectionView: React.FC<Props> = () => {
                                     <div className="col-md-12">
                                         <div className="row">
                                             <div className="col-md-6">
-                                                <ButtonSubmit
-                                                    loading={loading}
-                                                    buttonText="Do report"
-                                                    onClick={() => handleDoReport()}
-                                                />
+                                                {(reportUrl !== null) ? (
+                                                    <ButtonSubmit
+                                                        loading={loading}
+                                                        buttonText="Create a new report"
+                                                        onClick={() => handleDoReport()}
+                                                    />
+                                                ) : (
+                                                    <ButtonSubmit
+                                                        loading={loading}
+                                                        buttonText="Create a report"
+                                                        onClick={() => handleDoReport()}
+                                                    />
+                                                )}
                                             </div>
                                             <div className="col-md-6">
                                                 <ButtonSubmit
                                                     buttonText="Done"
-                                                    onClick={() => handleOpenModal()}
+                                                    onClick={() => handleInspectionFinishOpenModal()}
                                                 />
                                             </div>
                                         </div>
@@ -342,9 +446,17 @@ const InspectionView: React.FC<Props> = () => {
                                 )}
 
                                 <Alert successful={successful} message={message}/>
-                            </Form>
-                        </Formik>
-                    </div>
+                            </div>
+
+                            {(state.status === InspectionStatus.IN_PROCESS &&
+                                (state.currentUser.role === "EMPLOYEE_OWNER" || state.currentUser.role === "EMPLOYEE")) && (
+                                <div className="col-md-8 mb-3 mx-auto">
+                                    <h3 className="text-center">Description of defects</h3>
+                                    {generateFields()}
+                                </div>
+                            )}
+                        </Form>
+                    </Formik>
                 </div>
             ) : null}
         </div>

@@ -6,18 +6,22 @@ from rest_framework.views import APIView
 
 from file_storage_items.models import FileStorageItem
 from inspections.models import Inspection
+from sky_drones.mixins import AmazonS3Mixin
 from sky_drones.utils import RoleEmployeeBasedPermission
 from .models import Defect
-from .serializers import DefectSerializer
+from .serializers import DefectWithUrlSerializer, DefectDeleteSerializer
 
 
-class DefectAPIList(generics.ListAPIView):
+class DefectAPIList(APIView):
     permission_classes = (permissions.IsAuthenticated, RoleEmployeeBasedPermission,)
-    queryset = Defect.objects.all()
-    serializer_class = DefectSerializer
+
+    def get(self, request, inspection_id):
+        defects_queryset = Defect.objects.filter(inspection_id=inspection_id, deleted=False)
+        serializer = DefectWithUrlSerializer(defects_queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class DefectAPICreate(APIView):
+class DefectAPICreate(APIView, AmazonS3Mixin):
     permission_classes = (permissions.IsAuthenticated, RoleEmployeeBasedPermission,)
 
     def post(self, request):
@@ -32,7 +36,7 @@ class DefectAPICreate(APIView):
             severity = defect.get('severity')
             description = defect.get('description')
 
-            key = get_key_from_url(image_url)
+            key = self.get_key_from_url(image_url)
             file_storage_item = FileStorageItem.objects.get(file_name=key)
 
             new_defect = Defect.objects.create(
@@ -48,19 +52,7 @@ class DefectAPICreate(APIView):
         return Response(status=status.HTTP_201_CREATED)
 
 
-class DefectAPIUpdate(generics.UpdateAPIView):
+class DefectAPIDelete(generics.UpdateAPIView):
     permission_classes = (permissions.IsAuthenticated, RoleEmployeeBasedPermission,)
     queryset = Defect.objects.all()
-    serializer_class = DefectSerializer
-
-
-def get_key_from_url(url):
-    parts = url.split("/")
-    url_after_fourth_part = "".join(parts[3:])
-
-    question_mark_index = url_after_fourth_part.rfind("?")
-
-    if question_mark_index != -1:
-        return url_after_fourth_part[:question_mark_index]
-    else:
-        return url_after_fourth_part
+    serializer_class = DefectDeleteSerializer

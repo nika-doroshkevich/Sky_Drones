@@ -52,7 +52,11 @@ class ReportAPICreate(APIView, AmazonS3Mixin):
         facility = Facility.objects.get(id=inspection.facility.id)
         pilot = AppUser.objects.get(id=inspection.pilot.id)
         inspector = AppUser.objects.get(id=inspection.inspector.id)
-        defects_queryset = Defect.objects.filter(inspection_id=inspection_id)
+        defects_queryset = Defect.objects.filter(inspection_id=inspection_id, deleted=False)
+        if not defects_queryset:
+            return Response({'detail': 'No defects were found for this inspection'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
         file_storage_item_template_id = 11
         template_id = 1
 
@@ -120,28 +124,39 @@ class ReportAPICreate(APIView, AmazonS3Mixin):
         document.save(document_buffer)
         document_buffer.seek(0)
 
-        unique_filename = str(uuid.uuid4()) + ".docx"
-        url = self.upload_to_s3(document_buffer, unique_filename)
-        if not url:
-            return Response({'detail': 'Failed to upload report to S3'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        report_queryset = Report.objects.filter(inspection_id=inspection_id)
+        if not report_queryset:
+            unique_filename = str(uuid.uuid4()) + ".docx"
+            url = self.upload_to_s3(document_buffer, unique_filename)
+            if not url:
+                return Response({'detail': 'Failed to upload report to S3'},
+                                status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        file_storage_item = FileStorageItem.objects.create(
-            file_name=unique_filename,
-            type=FileStorageItemType.REPORT.value,
-            path=url,
-            facility=facility
-        )
+            file_storage_item = FileStorageItem.objects.create(
+                file_name=unique_filename,
+                type=FileStorageItemType.REPORT.value,
+                path=url,
+                facility=facility
+            )
 
-        template = Template.objects.get(id=template_id)
-        Report.objects.create(
-            created_date=datetime.now(),
-            author=author,
-            template=template,
-            inspection=inspection,
-            file_storage_item=file_storage_item
-        )
+            template = Template.objects.get(id=template_id)
+            Report.objects.create(
+                created_date=datetime.now(),
+                author=author,
+                template=template,
+                inspection=inspection,
+                file_storage_item=file_storage_item
+            )
 
-        presigned_url = self.get_generated_presigned_url(file_storage_item.file_name)
+            presigned_url = self.get_generated_presigned_url(file_storage_item.file_name)
+        else:
+            report_file_storage_item_id = report_queryset[0].file_storage_item_id
+            file_storage_item = FileStorageItem.objects.get(id=report_file_storage_item_id)
+            url = self.upload_to_s3(document_buffer, file_storage_item.file_name)
+            if not url:
+                return Response({'detail': 'Failed to upload report to S3'},
+                                status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            presigned_url = self.get_generated_presigned_url(url)
 
         return Response({'presigned_url': presigned_url}, status=status.HTTP_201_CREATED)
 
@@ -155,6 +170,8 @@ def replace_text_in_paragraph(paragraph, key, value):
 
 
 def create_severity_pie_diagram_buffer(defects_queryset):
+    plt.clf()
+
     severity_counts = {
         "CRITICAL": 0,
         "MAJOR": 0,
@@ -164,13 +181,22 @@ def create_severity_pie_diagram_buffer(defects_queryset):
     for defect in defects_queryset:
         severity_counts[defect.severity] += 1
 
-    sizes = [severity_counts["CRITICAL"],
-             severity_counts["MAJOR"],
-             severity_counts["MINOR"],
-             severity_counts["TRIVIAL"]]
+    sizes = []
+    labels = []
+    colors = []
 
-    labels = ['CRITICAL', 'MAJOR', 'MINOR', 'TRIVIAL']
-    colors = ['red', 'orange', 'yellow', 'lightskyblue']
+    severity_levels = {
+        "CRITICAL": 'red',
+        "MAJOR": 'orange',
+        "MINOR": 'yellow',
+        "TRIVIAL": 'lightskyblue'
+    }
+
+    for severity, count in severity_counts.items():
+        if count > 0:
+            sizes.append(count)
+            labels.append(severity)
+            colors.append(severity_levels[severity])
 
     plt.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%', startangle=140)
     plt.title('Defects severity')
