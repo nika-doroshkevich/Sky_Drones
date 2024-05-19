@@ -4,12 +4,6 @@ from defects.models import Defect
 from sky_drones.mixins import AmazonS3Mixin
 
 
-class DefectSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Defect
-        fields = '__all__'
-
-
 class DefectDeleteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Defect

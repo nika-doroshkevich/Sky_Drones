@@ -110,7 +110,7 @@ def check_users_ability_to_access_facility(user, facility_id):
 def get_images_urls_from_database(facility_id):
     try:
         facility = Facility.objects.get(pk=facility_id)
-        images = FileStorageItem.objects.filter(facility=facility)
+        images = FileStorageItem.objects.filter(facility=facility, type='IMAGE')
 
         urls = []
         for image in images:

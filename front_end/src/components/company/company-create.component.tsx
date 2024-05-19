@@ -17,7 +17,6 @@ type State = {
     redirect: string | null,
     userReady: boolean,
     currentUser: IUser & { access: string }
-    loading: boolean,
     message: string,
     successful: boolean,
 
@@ -38,7 +37,6 @@ export default class Company extends Component<Props, State> {
             redirect: null,
             userReady: false,
             currentUser: {access: ""},
-            loading: false,
             message: "",
             successful: false,
 
@@ -105,11 +103,15 @@ export default class Company extends Component<Props, State> {
         companyType: string;
         inspectingCompany: any
     }) {
-        const {name, phone, website, companyType, inspectingCompany} = formValue;
+        let {name, phone, website, companyType, inspectingCompany} = formValue;
         this.setState({
             message: "",
             successful: false
         });
+
+        if (companyType === 'INSPECTING') {
+            inspectingCompany = null;
+        }
 
         CompanyService.create(
             name,
@@ -118,7 +120,7 @@ export default class Company extends Component<Props, State> {
             companyType,
             inspectingCompany
         ).then(
-            response => {
+            () => {
                 this.setState({
                     message: "The data has been saved successfully!",
                     successful: true
@@ -142,7 +144,7 @@ export default class Company extends Component<Props, State> {
             return <Navigate to={this.state.redirect}/>
         }
 
-        const {loading, message, successful} = this.state;
+        const {message, successful} = this.state;
 
         const initialValues = {
             name: "",
@@ -163,53 +165,61 @@ export default class Company extends Component<Props, State> {
                             onSubmit={this.handleCreate}
                             enableReinitialize
                         >
-                            <Form>
+                            {({values, handleChange}) => (
+                                <Form>
 
-                                <InputField label="Name" name="name" type="text"/>
-                                <InputField label="Phone" name="phone" type="text"/>
-                                <InputField label="Website" name="website" type="text"/>
+                                    <InputField label="Name" name="name" type="text"/>
+                                    <InputField label="Phone" name="phone" type="text"/>
+                                    <InputField label="Website" name="website" type="text"/>
 
-                                <div className="form-group">
-                                    <label htmlFor="companyType">Company type</label>
-                                    <Field
-                                        name="companyType"
-                                        as="select"
-                                        className="form-control"
-                                    >
-                                        <option value="" disabled>Select a company type</option>
-                                        <option value="INSPECTING">INSPECTING</option>
-                                        <option value="INSPECTED">INSPECTED</option>
-                                    </Field>
-                                    <ErrorMessage
-                                        name="companyType"
-                                        component="div"
-                                        className="alert alert-danger"
-                                    />
-                                </div>
+                                    <div className="form-group">
+                                        <label htmlFor="companyType">Company type</label>
+                                        <Field
+                                            name="companyType"
+                                            as="select"
+                                            className="form-control"
+                                            onChange={(e: { target: { value: any; }; }) => {
+                                                const value = e.target.value;
+                                                this.setState({companyType: value});
+                                                handleChange(e);
+                                            }}
+                                        >
+                                            <option value="" disabled>Select a company type</option>
+                                            <option value="INSPECTING">INSPECTING</option>
+                                            <option value="INSPECTED">INSPECTED</option>
+                                        </Field>
+                                        <ErrorMessage
+                                            name="companyType"
+                                            component="div"
+                                            className="alert alert-danger"
+                                        />
+                                    </div>
 
-                                <div className="form-group">
-                                    <label htmlFor="inspectingCompany">Inspecting company</label>
-                                    <Field
-                                        name="inspectingCompany"
-                                        as="select"
-                                        className="form-control"
-                                    >
-                                        <option value="" disabled>Select an inspecting company</option>
-                                        {this.state.inspectingCompanies.map(company => (
-                                            <option key={company.id} value={company.id}>{company.name}</option>
-                                        ))}
-                                    </Field>
-                                    <ErrorMessage
-                                        name="inspectingCompany"
-                                        component="div"
-                                        className="alert alert-danger"
-                                    />
-                                </div>
+                                    <div className="form-group">
+                                        <label htmlFor="inspectingCompany">Inspecting company</label>
+                                        <Field
+                                            name="inspectingCompany"
+                                            as="select"
+                                            className="form-control"
+                                            disabled={values.companyType === "INSPECTING"}
+                                        >
+                                            <option value="" disabled>Select an inspecting company</option>
+                                            {this.state.inspectingCompanies.map(company => (
+                                                <option key={company.id} value={company.id}>{company.name}</option>
+                                            ))}
+                                        </Field>
+                                        <ErrorMessage
+                                            name="inspectingCompany"
+                                            component="div"
+                                            className="alert alert-danger"
+                                        />
+                                    </div>
 
-                                <ButtonSubmit loading={loading} buttonText={"Create"}/>
-                                <Alert successful={successful} message={message}/>
+                                    <ButtonSubmit buttonText={"Create"}/>
+                                    <Alert successful={successful} message={message}/>
 
-                            </Form>
+                                </Form>
+                            )}
                         </Formik>
                     </div> : null}
             </div>
