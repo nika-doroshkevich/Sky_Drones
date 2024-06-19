@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from sky_drones.mixins import UserRightsCorrespondingCheckMixin
 from sky_drones.utils import RoleCustomerOwnerBasedPermission, RoleEmployeeBasedPermission
 from .models import Inspection
-from .serializers import InspectionSerializer
+from .serializers import InspectionSerializer, InspectionCreateSerializer
 from .utils import InspectionStatus
 
 
@@ -35,7 +35,7 @@ class InspectionAPIListForDefectsPage(APIView, UserRightsCorrespondingCheckMixin
 class InspectionAPICreate(generics.CreateAPIView):
     permission_classes = (permissions.IsAuthenticated, RoleCustomerOwnerBasedPermission,)
     queryset = Inspection.objects.all()
-    serializer_class = InspectionSerializer
+    serializer_class = InspectionCreateSerializer
 
 
 class InspectionAPIRetrieve(generics.RetrieveAPIView, UserRightsCorrespondingCheckMixin):
